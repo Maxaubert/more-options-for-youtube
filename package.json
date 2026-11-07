@@ -1,0 +1,16 @@
+{
+  "name": "yt-filter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zen/Firefox extension that filters the YouTube home page",
+  "scripts": {
+    "test": "node --test",
+    "lint": "web-ext lint --ignore-files test package.json package-lock.json scripts README.md",
+    "dev": "web-ext run --ignore-files test package.json package-lock.json scripts README.md --start-url https://www.youtube.com/",
+    "build": "web-ext build --overwrite-dest --ignore-files test package.json package-lock.json scripts README.md",
+    "sign": "python scripts/sign.py"
+  },
+  "devDependencies": {
+    "web-ext": "^10.8.0"
+  }
+}
