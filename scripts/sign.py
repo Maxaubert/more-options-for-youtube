@@ -19,7 +19,7 @@ import keyring
 
 SERVICE = "amo-yt-filter"
 ROOT = Path(__file__).resolve().parent.parent
-IGNORE = ["test", "package.json", "package-lock.json", "scripts", "README.md", "node_modules"]
+IGNORE = ["test", "docs", "package.json", "package-lock.json", "scripts", "README.md", "node_modules"]
 
 
 def clipboard() -> str:

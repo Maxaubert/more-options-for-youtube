@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YT Filter",
-  "version": "0.2.1",
-  "description": "A calmer YouTube: hides Shorts, members-only and old videos, skips repeats in autoplay, and sets player defaults.",
+  "name": "More Options for YouTube",
+  "version": "0.3.0",
+  "description": "Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, and set your player defaults.",
   "browser_specific_settings": {
     "gecko": {
       "id": "yt-filter@loftspace",
@@ -28,7 +28,7 @@
     }
   ],
   "action": {
-    "default_title": "YT Filter",
+    "default_title": "More Options for YouTube",
     "default_popup": "popup/popup.html",
     "default_icon": "icons/icon.svg"
   }

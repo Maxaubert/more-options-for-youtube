@@ -116,6 +116,18 @@ test("channel vs views/date text", () => {
   }
 });
 
+test("block lists", () => {
+  assert.deepEqual(Y.parseList("Linus Tech Tips\nMrBeast, clickbait\n\n mrbeast "), ["linus tech tips", "mrbeast", "clickbait"]);
+  const s = { ...S, blockChannels: "MrBeast\n@somehandle", blockWords: "reaction" };
+  assert.equal(Y.decideTile(video({ channel: "MrBeast" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ channel: "mrbeast " }), s), "blocked");
+  assert.equal(Y.decideTile(video({ channel: "Mr" }), s), null);
+  assert.equal(Y.decideTile(video({ channel: "X", handle: "@SomeHandle" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ title: "My REACTION to it" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ title: "Calm video" }), s), null);
+  assert.equal(Y.decideTile(video({ channel: "MrBeast" }), { ...s, enabled: false }), null);
+});
+
 test("video ids", () => {
   assert.equal(Y.videoIdFromHref("/watch?v=KfODG5REyss"), "KfODG5REyss");
   assert.equal(Y.videoIdFromHref("/watch?v=NiCgcUTL9_Q&pp=0gcJ"), "NiCgcUTL9_Q");

@@ -47,3 +47,30 @@ html[data-ytf-hidemeta] ytd-watch-metadata :is(#info-container, ytd-watch-info-t
 html[data-ytf-hidemeta] like-button-view-model :is(.yt-spec-button-shape-next__button-text-content, [class*="ButtonShapeNextButtonTextContent"]) {
   display: none !important;
 }
+
+/* End cards: the video tiles and channel buttons over the last seconds of a video. */
+html[data-ytf-noendcards] :is(.ytp-ce-element, .ytp-cards-teaser, .ytp-cards-button, .ytp-ce-covering-overlay) {
+  display: none !important;
+}
+
+html[data-ytf-nocomments] :is(ytd-comments#comments, ytd-watch-flexy #comments) {
+  display: none !important;
+}
+
+/* "Block channel" entry added to a tile's ... menu; sized like YouTube's own entries. */
+.ytf-block-item {
+  padding: 8px 16px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  font: 400 1.4rem/2rem "Roboto", "Arial", sans-serif;
+  color: var(--yt-spec-text-primary, #f1f1f1);
+  cursor: pointer;
+  border-top: 1px solid var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.1));
+}
+
+.ytf-block-item:hover,
+.ytf-block-item:focus-visible {
+  background: var(--yt-spec-10-percent-layer, rgba(255, 255, 255, 0.1));
+  outline: none;
+}

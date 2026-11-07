@@ -35,10 +35,17 @@
     qualityValue: "highest",
     theater: false,
     subtitles: "default", // default | off | no | en
+    shortsAsVideo: true, // open Shorts in the normal player
+    noEndCards: false,
+    noComments: false,
+    // Block lists: one entry per line (or comma separated), matched without case
+    blockChannels: "",
+    blockWords: "",
   };
 
   const REASONS = {
     members: "Members only",
+    blocked: "Blocked",
     shorts: "Shorts",
     playables: "Playables",
     news: "News rows",
@@ -122,10 +129,33 @@
     return "video";
   }
 
-  // info: {kind, members, live, upcoming, ageDays, views, watchedPct}. Returns a REASONS key or null.
+  // "Linus Tech Tips\nMrBeast, clickbait" -> ["linus tech tips", "mrbeast", "clickbait"]. Cached per text,
+  // since every tile on every pass asks.
+  const listCache = new Map();
+  function parseList(text) {
+    if (!text) return [];
+    if (!listCache.has(text)) {
+      if (listCache.size > 20) listCache.clear();
+      listCache.set(text, [...new Set(text.split(/[\n,]/).map((x) => x.trim().toLowerCase()).filter(Boolean))]);
+    }
+    return listCache.get(text);
+  }
+
+  // Channel must match a listed name exactly (or its @handle); a word matches anywhere in the title.
+  function isBlocked(info, s) {
+    const channels = parseList(s.blockChannels);
+    const channel = (info.channel || "").trim().toLowerCase();
+    if (channel && channels.some((c) => c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
+    if (info.handle && channels.includes(info.handle.toLowerCase())) return true;
+    const title = (info.title || "").toLowerCase();
+    return !!title && parseList(s.blockWords).some((w) => title.includes(w));
+  }
+
+  // info: {kind, members, live, upcoming, ageDays, views, watchedPct, channel, handle, title}. Returns a REASONS key or null.
   function decideTile(info, s) {
     if (info.members) return "members";
     if (!s.enabled) return null;
+    if (isBlocked(info, s)) return "blocked";
     if (info.kind === "shorts" && s.shorts) return "shorts";
     if (info.kind === "playable" && s.playables) return "playables";
     if (info.kind === "mix" && s.mixes) return "mixes";
@@ -193,7 +223,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

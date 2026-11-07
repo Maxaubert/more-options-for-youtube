@@ -50,6 +50,10 @@
       kind = "playlist";
     }
 
+    const titleEl = tile.querySelector('#video-title, a[class*="LockupMetadataViewModelTitle"]');
+    const channelEl = tile.querySelector('[data-ytf-part="channel"], ytd-channel-name #text, ytd-channel-name a');
+    const avatar = tile.querySelector('[aria-label^="Go to channel "], [aria-label^="Gå til kanalen "]');
+    const handleLink = tile.querySelector('a[href^="/@"]');
     const meta = labelsThenTexts(tile, META);
     const badges = labelsThenTexts(tile, BADGE);
     const styles = [...tile.querySelectorAll("[overlay-style]")].map((n) => n.getAttribute("overlay-style"));
@@ -60,6 +64,13 @@
       id: Y.videoIdFromHref(href),
       link,
       kind,
+      title: titleEl ? (titleEl.getAttribute("title") || titleEl.textContent || "").trim() : "",
+      channel: channelEl
+        ? channelEl.textContent.trim()
+        : avatar
+          ? avatar.getAttribute("aria-label").replace(/^(Go to channel|Gå til kanalen) /, "").trim()
+          : "",
+      handle: handleLink ? handleLink.getAttribute("href").slice(1).split(/[/?]/)[0] : "",
       members: badges.some(Y.isMembersOnly) || meta.some(Y.isMembersOnly),
       live: styles.includes("LIVE") || badges.some(Y.isLiveBadge) || meta.some(Y.isWatching),
       upcoming: styles.includes("UPCOMING") || meta.some(Y.isUpcoming) || badges.some(Y.isUpcoming),
@@ -150,6 +161,8 @@
       "data-ytf-hideavatars": on && settings.hideAvatars,
       "data-ytf-hidemeta": on && settings.hideMeta,
       "data-ytf-perrow": on && settings.perRow,
+      "data-ytf-noendcards": on && settings.noEndCards,
+      "data-ytf-nocomments": on && settings.noComments,
     };
     for (const [name, value] of Object.entries(flags)) {
       if (value && !ROOT.hasAttribute(name)) ROOT.setAttribute(name, "");
@@ -214,6 +227,61 @@
     }, 300);
   }
 
+  // --- Shorts in the normal player ------------------------------------------------------------
+  function shortsToWatch() {
+    const m = /^\/shorts\/([\w-]{11})/.exec(location.pathname);
+    if (m && settings.enabled && settings.shortsAsVideo) location.replace("/watch?v=" + m[1]);
+  }
+
+  // --- "Block channel" in a tile's ... menu ---------------------------------------------------
+  // YouTube builds the menu itself in a shared popup, so after a click on a tile's menu button we
+  // wait for the popup and add one entry to it.
+  const BLOCK_ITEM = "ytf-block-item";
+  document.addEventListener("pointerdown", (e) => {
+    const button = e.target.closest && e.target.closest('[class*="MenuButton"], ytd-menu-renderer, #menu, button[aria-label]');
+    const tile = button && button.closest(TILE);
+    if (!tile || !settings.enabled || e.target.closest("a, h3")) return;
+    const info = tileInfo(tile);
+    const name = info.channel || (info.handle ? info.handle : "");
+    if (!name) return;
+    let tries = 0;
+    const timer = setInterval(() => {
+      const list = openMenuList();
+      if (list || ++tries > 20) clearInterval(timer);
+      if (list) addBlockItem(list, name);
+    }, 100);
+  }, true);
+
+  function openMenuList() {
+    const dropdown = [...document.querySelectorAll("ytd-popup-container tp-yt-iron-dropdown")].find(
+      (d) => d.getAttribute("aria-hidden") !== "true" && getComputedStyle(d).display !== "none"
+    );
+    return dropdown && dropdown.querySelector("yt-list-view-model, tp-yt-paper-listbox#items, #items");
+  }
+
+  function addBlockItem(list, name) {
+    for (const old of document.querySelectorAll("." + BLOCK_ITEM)) old.remove();
+    const item = document.createElement("div");
+    item.className = BLOCK_ITEM;
+    item.setAttribute("role", "menuitem");
+    item.tabIndex = 0;
+    item.textContent = `Block channel: ${name}`;
+    const block = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const { blockChannels } = await browser.storage.local.get({ blockChannels: "" });
+      if (!Y.parseList(blockChannels).includes(name.toLowerCase())) {
+        await browser.storage.local.set({ blockChannels: (blockChannels.trim() ? blockChannels.trim() + "\n" : "") + name });
+      }
+      item.remove();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", code: "Escape", bubbles: true }));
+      document.body.click();
+    };
+    item.addEventListener("click", block);
+    item.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && block(e));
+    list.append(item);
+  }
+
   // --- Wiring ---------------------------------------------------------------------------------
   let timer = 0;
   function schedule() {
@@ -248,6 +316,7 @@
     if (!muts.every(insidePlayer)) schedule();
   }).observe(ROOT, { childList: true, subtree: true, characterData: true });
   document.addEventListener("yt-navigate-finish", () => {
+    shortsToWatch();
     if (location.pathname === "/watch") onWatchPage();
     schedule();
   });
@@ -257,6 +326,7 @@
     saved.ytfPlayed.forEach((id) => played.add(id));
     saved.ytfWatched.forEach((id) => watched.add(id));
     await loadSettings();
+    shortsToWatch();
     if (location.pathname === "/watch" && currentId()) remember(played, "ytfPlayed", currentId());
   })();
 })();
