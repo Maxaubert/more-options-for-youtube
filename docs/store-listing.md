@@ -43,6 +43,9 @@ Reads YouTube in English and Norwegian.
 **Privacy:** no data leaves your browser. No accounts, no tracking, no analytics. Settings are stored
 locally by your browser.
 
+**Open source:** the code is on GitHub at https://github.com/Maxaubert/more-options-for-youtube (MIT licence). Bug
+reports and ideas are welcome there.
+
 ## Fields
 
 | Field | Value |
@@ -51,7 +54,7 @@ locally by your browser.
 | Tags | youtube, shorts, filter, autoplay, accessibility |
 | License | MIT (`LICENSE`) |
 | Privacy policy | Not required: the add-on collects no data (`data_collection_permissions: none` in the manifest) |
-| Support | None for now (Max, 2026-11-07) |
+| Support | None for now (Max, 2026-11-07); the GitHub link is in the description |
 | Source code | Not needed: the code is not minified or bundled |
 | Screenshots | `docs/store/screenshot-1.png` to `-3.png` (1280x800, made from the real popup) |
 
