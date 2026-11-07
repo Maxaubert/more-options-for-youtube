@@ -106,6 +106,41 @@ test("unknown age or views never hides", () => {
   assert.equal(Y.decideTile(video({ ageDays: null, views: null }), s), null);
 });
 
+test("video ids", () => {
+  assert.equal(Y.videoIdFromHref("/watch?v=KfODG5REyss"), "KfODG5REyss");
+  assert.equal(Y.videoIdFromHref("/watch?v=NiCgcUTL9_Q&pp=0gcJ"), "NiCgcUTL9_Q");
+  assert.equal(Y.videoIdFromHref("/shorts/abcdefghijk"), "abcdefghijk");
+  assert.equal(Y.videoIdFromHref("/playlist?list=PL1"), null);
+});
+
+test("quality", () => {
+  const levels = ["hd1080", "hd720", "large", "medium", "small", "tiny", "auto"];
+  assert.equal(Y.pickQuality(levels, "highest"), "hd1080");
+  assert.equal(Y.pickQuality(levels, "2160"), "hd1080");
+  assert.equal(Y.pickQuality(levels, "720"), "hd720");
+  assert.equal(Y.pickQuality(levels, "480"), "large");
+  assert.equal(Y.pickQuality(["auto"], "highest"), null);
+});
+
+test("subtitles", () => {
+  const en = { languageCode: "en", kind: "" };
+  const enAuto = { languageCode: "en", kind: "asr" };
+  const nb = { languageCode: "nb", kind: "" };
+  assert.equal(Y.pickSubtitles([en], "default"), null);
+  assert.equal(Y.pickSubtitles([en], "off"), "off");
+  assert.deepEqual(Y.pickSubtitles([en, nb], "no"), { track: nb });
+  assert.deepEqual(Y.pickSubtitles([{ languageCode: "no" }], "no"), { track: { languageCode: "no" } });
+  assert.deepEqual(Y.pickSubtitles([enAuto, en], "no"), { translate: en, to: "no" });
+  assert.deepEqual(Y.pickSubtitles([enAuto, en], "en"), { track: en });
+  assert.equal(Y.pickSubtitles([], "no"), null);
+});
+
+test("smart autoplay picks the first new video", () => {
+  const c = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+  assert.deepEqual(Y.pickNext(c, "a", new Set(["b"]), new Set(["c"])), { id: "d" });
+  assert.equal(Y.pickNext(c, "a", new Set(["b", "c", "d"]), new Set()), null);
+});
+
 test("shelves", () => {
   assert.equal(Y.decideShelf({ shorts: true, playables: false, title: "Shorts" }, S), "shorts");
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "YouTube Playables" }, S), "playables");

@@ -53,7 +53,9 @@ section {
   cursor: pointer;
 }
 
-.row + .row, .rule + .rule { border-top: 1px solid var(--line); }
+:is(.row, .rule) + :is(.row, .rule) { border-top: 1px solid var(--line); }
+
+.select-row { cursor: default; }
 
 .locked { cursor: default; }
 .locked em { font-style: normal; color: var(--muted); }

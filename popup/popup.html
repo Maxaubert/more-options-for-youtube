@@ -50,9 +50,64 @@
         <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"><span>% watched</span>
       </div>
     </div>
+    <label class="row"><span>Also on Search, Subscriptions and the video sidebar</span><input type="checkbox" data-key="everywhere"></label>
   </section>
 
-  <footer id="stats">Open the YouTube home page to see what was hidden.</footer>
+  <section>
+    <h2>Grid</h2>
+    <div class="rule">
+      <label class="row"><span>Videos per row</span><input type="checkbox" data-key="perRow"></label>
+      <div class="inputs">
+        <input type="number" min="1" max="8" data-key="perRowValue" aria-label="Videos per row"><span>per row</span>
+      </div>
+    </div>
+    <label class="row"><span>Hide titles</span><input type="checkbox" data-key="hideTitles"></label>
+    <label class="row"><span>Hide channel names</span><input type="checkbox" data-key="hideChannels"></label>
+    <label class="row"><span>Hide views, date and likes</span><input type="checkbox" data-key="hideMeta"></label>
+  </section>
+
+  <section>
+    <h2>Playback</h2>
+    <label class="row"><span>No previews on hover</span><input type="checkbox" data-key="noPreview"></label>
+    <label class="row"><span>Autoplay skips watched and repeats</span><input type="checkbox" data-key="smartAutoplay"></label>
+    <div class="rule">
+      <label class="row"><span>Start at speed</span><input type="checkbox" data-key="speed"></label>
+      <div class="inputs">
+        <select data-key="speedValue" aria-label="Speed">
+          <option value="1">1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+    </div>
+    <div class="rule">
+      <label class="row"><span>Start at quality</span><input type="checkbox" data-key="quality"></label>
+      <div class="inputs">
+        <select data-key="qualityValue" aria-label="Quality">
+          <option value="highest">Highest</option>
+          <option value="2160">4K</option>
+          <option value="1440">1440p</option>
+          <option value="1080">1080p</option>
+          <option value="720">720p</option>
+          <option value="480">480p</option>
+        </select>
+      </div>
+    </div>
+    <label class="row"><span>Theater mode</span><input type="checkbox" data-key="theater"></label>
+    <div class="row select-row">
+      <span>Subtitles</span>
+      <select data-key="subtitles" aria-label="Subtitles">
+        <option value="default">YouTube decides</option>
+        <option value="off">Always off</option>
+        <option value="no">Always Norwegian</option>
+        <option value="en">Always English</option>
+      </select>
+    </div>
+  </section>
+
+  <footer id="stats" hidden></footer>
   <script src="../src/parse.js"></script>
   <script src="popup.js"></script>
 </body>
