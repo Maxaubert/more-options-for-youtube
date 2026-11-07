@@ -6,7 +6,7 @@ A calmer YouTube. Hide what you never want to see, set rules for the rest, and m
 
 [![Firefox](https://img.shields.io/badge/Zen%20%2F%20Firefox-extension-E5484D?logo=firefoxbrowser&logoColor=white)](#install)
 [![Manifest](https://img.shields.io/badge/Manifest-V3-E5484D)](manifest.json)
-![Private](https://img.shields.io/badge/repo-private-555)
+[![License: MIT](https://img.shields.io/badge/license-MIT-E5484D)](LICENSE)
 
 </div>
 
