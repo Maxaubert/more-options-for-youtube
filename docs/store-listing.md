@@ -19,7 +19,7 @@ A calmer YouTube, on your terms.
 
 **Hide what you never want to see**
 - Shorts, Playables, news and trending rows, live streams, mixes and playlists, each with its own switch
-- Members-only videos, always: the ones that look normal until you click and hit a paywall
+- Members-only videos: the ones that look normal until you click and hit a paywall. By default you only see them from channels you are a paying member of
 - Videos older than an age you pick, or with fewer views than a number you pick
 - Videos you have already watched
 - Channels and title words you list, or straight from a video's ⋮ menu with "Block channel"
