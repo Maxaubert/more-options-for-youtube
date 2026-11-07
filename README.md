@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox and Zen: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.3.3](https://img.shields.io/badge/version-0.3.3-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.3.4](https://img.shields.io/badge/version-0.3.4-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff0000?style=flat-square)](manifest.json)
   [![No data collected](https://img.shields.io/badge/data%20collected-none-ff0000?style=flat-square)](#privacy)
