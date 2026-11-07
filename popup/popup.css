@@ -57,8 +57,6 @@ section {
 
 .select-row { cursor: default; }
 
-.locked { cursor: default; }
-.locked em { font-style: normal; color: var(--muted); }
 
 input[type="checkbox"] {
   width: 24px;
