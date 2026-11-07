@@ -27,7 +27,7 @@
   <section>
     <h2>Rules</h2>
     <div class="rule">
-      <label class="row"><span>Older than</span><input type="checkbox" data-key="maxAge"></label>
+      <label class="row"><span>No older than</span><input type="checkbox" data-key="maxAge"></label>
       <div class="inputs">
         <input type="number" min="1" data-key="maxAgeValue" aria-label="Age">
         <select data-key="maxAgeUnit" aria-label="Unit">
@@ -39,15 +39,15 @@
       </div>
     </div>
     <div class="rule">
-      <label class="row"><span>Fewer views than</span><input type="checkbox" data-key="minViews"></label>
+      <label class="row"><span>No fewer views than</span><input type="checkbox" data-key="minViews"></label>
       <div class="inputs">
-        <input type="number" min="0" step="100" data-key="minViewsValue" aria-label="Views">
+        <input type="number" min="0" step="100" data-key="minViewsValue" aria-label="Views"><span>views</span>
       </div>
     </div>
     <div class="rule">
-      <label class="row"><span>Watched at least</span><input type="checkbox" data-key="watched"></label>
+      <label class="row"><span>No more watch time than</span><input type="checkbox" data-key="watched"></label>
       <div class="inputs">
-        <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"><span>%</span>
+        <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"><span>% watched</span>
       </div>
     </div>
   </section>
