@@ -78,20 +78,17 @@ test("kind from link", () => {
 
 const video = (extra) => ({ kind: "video", members: false, live: false, upcoming: false, ageDays: 10, views: 5000, watchedPct: null, ...extra });
 
-test("members-only is hidden even with everything off", () => {
-  assert.equal(Y.decideTile(video({ members: true }), { ...S, enabled: false }), "members");
-});
-
-test("default rules: shorts and over a year", () => {
+test("default rules: shorts hidden, age and views left alone", () => {
   assert.equal(Y.decideTile(video({ kind: "shorts" }), S), "shorts");
-  assert.equal(Y.decideTile(video({ ageDays: 365 }), S), null);
-  assert.equal(Y.decideTile(video({ ageDays: 730 }), S), "age");
+  assert.equal(Y.decideTile(video({ kind: "playable" }), S), null);
+  assert.equal(Y.decideTile(video({ ageDays: 3650, views: 3 }), S), null);
+  assert.equal(Y.decideTile(video({ ageDays: 730 }), { ...S, maxAge: true }), "age");
   assert.equal(Y.decideTile(video({ kind: "mix" }), S), null);
   assert.equal(Y.decideTile(video({ live: true }), S), null);
 });
 
 test("optional rules", () => {
-  const s = { ...S, mixes: true, playlists: true, live: true, watched: true, minViews: true, minViewsValue: 1000 };
+  const s = { ...S, mixes: true, playlists: true, live: true, watched: true, maxAge: true, minViews: true, minViewsValue: 1000 };
   assert.equal(Y.decideTile(video({ kind: "mix" }), s), "mixes");
   assert.equal(Y.decideTile(video({ kind: "playlist" }), s), "playlists");
   assert.equal(Y.decideTile(video({ upcoming: true }), s), "live");
@@ -118,24 +115,24 @@ test("channel vs views/date text", () => {
 
 test("members-only modes", () => {
   const m = video({ members: true, channel: "Vsauce" });
-  assert.equal(Y.decideTile(m, S), "members");
+  assert.equal(Y.decideTile(m, S), "members"); // default: show only for channels you are a member of
+  assert.equal(Y.decideTile({ ...m, member: true }, S), null);
+  assert.equal(Y.decideTile({ ...m, member: true }, { ...S, membersMode: "always" }), "members");
   assert.equal(Y.decideTile(m, { ...S, membersMode: "never" }), null);
-  assert.equal(Y.decideTile(m, { ...S, membersMode: "unlessSubscribed" }), "members");
-  assert.equal(Y.decideTile({ ...m, subscribed: true }, { ...S, membersMode: "unlessSubscribed" }), null);
-  assert.equal(Y.decideTile({ ...m, subscribed: true }, S), "members");
+  assert.equal(Y.decideTile(m, { ...S, enabled: false }), null); // the master switch turns everything off
 });
 
-test("subscriptions page", () => {
+test("memberships page", () => {
   const html =
-    '..."channelRenderer":{"channelId":"UC1","title":{"simpleText":"Vsauce"},"navigationEndpoint":{"browseEndpoint":{"canonicalBaseUrl":"/@Vsauce"}}}' +
-    '..."channelRenderer":{"channelId":"UC2","title":{"simpleText":"Tom \\"Quotes\\" Scott"},"x":{"canonicalBaseUrl":"/@TomScott"}}';
-  const subs = Y.parseSubscriptions(html);
-  assert.deepEqual([...subs.names], ["vsauce", 'tom "quotes" scott']);
-  assert.deepEqual([...subs.handles], ["@vsauce", "@tomscott"]);
-  assert.ok(Y.isSubscribed({ channel: "VSAUCE" }, subs));
-  assert.ok(Y.isSubscribed({ channel: "x", handle: "@TomScott" }, subs));
-  assert.ok(!Y.isSubscribed({ channel: "Other" }, subs));
-  assert.ok(!Y.isSubscribed({ channel: "Vsauce" }, null));
+    '..."title":{"simpleText":"Vsauce"},"navigationEndpoint":{"browseEndpoint":{"canonicalBaseUrl":"/@Vsauce"}}' +
+    '..."title":{"simpleText":"Tom \\"Quotes\\" Scott"},"x":{"canonicalBaseUrl":"/@TomScott"}';
+  const list = Y.parseChannelList(html);
+  assert.ok(list.names.has("vsauce") && list.names.has('tom "quotes" scott'));
+  assert.deepEqual([...list.handles], ["@vsauce", "@tomscott"]);
+  assert.ok(Y.inChannelList({ channel: "VSAUCE" }, list));
+  assert.ok(Y.inChannelList({ channel: "x", handle: "@TomScott" }, list));
+  assert.ok(!Y.inChannelList({ channel: "Other" }, list));
+  assert.ok(!Y.inChannelList({ channel: "Vsauce" }, null));
 });
 
 test("block lists", () => {
@@ -187,7 +184,8 @@ test("smart autoplay picks the first new video", () => {
 
 test("shelves", () => {
   assert.equal(Y.decideShelf({ shorts: true, playables: false, title: "Shorts" }, S), "shorts");
-  assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "YouTube Playables" }, S), "playables");
+  assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "YouTube Playables" }, S), null);
+  assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "YouTube Playables" }, { ...S, playables: true }), "playables");
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "Breaking news" }, S), "news");
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "Siste nytt" }, S), "news");
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "Recommended" }, S), null);

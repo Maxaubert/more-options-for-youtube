@@ -28,8 +28,8 @@ sent anywhere.
 
 **Hide what you never want to see**
 - Shorts, Playables, news and trending rows, live and upcoming streams, mixes and playlists, one switch each.
-- Members-only videos: the ones that look normal until you click and hit a paywall. Always hide them, hide
-  them unless you subscribe to the channel, or show them.
+- Members-only videos: the ones that look normal until you click and hit a paywall. By default you only
+  see them from channels you are a paying member of; you can also always hide or always show them.
 - Videos older than an age you pick, with fewer views than a number you pick, or already watched past a
   percentage you pick.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
@@ -67,10 +67,12 @@ Needs Firefox or Zen 142 or newer.
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
   Block section (one per line). Remove a line to unblock.
-- **Turn it all off:** the switch at the top of the popup pauses every filter. Members-only videos follow
-  their own setting.
-- **Show if subscribed:** the add-on reads your own subscriptions page on YouTube once a day to know
-  which channels you follow. The list stays in your browser.
+- **Turn it all off:** the switch at the top of the popup pauses everything, so YouTube looks exactly as
+  normal.
+- **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
+  once a day to know which channels you pay for. The list stays in your browser.
+- **Defaults:** Shorts and news rows are hidden, autoplay skips repeats, and members-only videos show only
+  for your memberships. Everything else starts off.
 
 ## Privacy
 
