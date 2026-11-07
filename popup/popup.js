@@ -35,10 +35,9 @@
     } catch {
       // Not a YouTube tab: no content script to answer.
     }
-    if (!res || !res.home) {
-      footer.textContent = "Open the YouTube home page to see what was hidden.";
-      return;
-    }
+    // The count only makes sense on a page the filters work on; elsewhere the footer stays hidden.
+    footer.hidden = !res || !res.active;
+    if (footer.hidden) return;
     const parts = Object.entries(res.counts).sort((a, b) => b[1] - a[1]);
     const total = parts.reduce((sum, [, n]) => sum + n, 0);
     footer.replaceChildren();

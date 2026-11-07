@@ -18,6 +18,22 @@
     maxAgeUnit: "years",
     minViews: false,
     minViewsValue: 1000,
+    everywhere: true, // also Search, Subscriptions and the sidebar next to a video
+    // Grid
+    perRow: false,
+    perRowValue: 3,
+    hideTitles: false,
+    hideChannels: false,
+    hideMeta: false,
+    // Playback
+    noPreview: true,
+    smartAutoplay: true,
+    speed: false,
+    speedValue: "1.25",
+    quality: false,
+    qualityValue: "highest",
+    theater: false,
+    subtitles: "default", // default | off | no | en
   };
 
   const REASONS = {
@@ -129,10 +145,47 @@
     return null;
   }
 
+  function videoIdFromHref(href) {
+    if (!href) return null;
+    const m = /[?&]v=([\w-]{11})|\/shorts\/([\w-]{11})/.exec(href);
+    return m ? m[1] || m[2] : null;
+  }
+
+  // YouTube player quality names, best first. Target is "highest" or a height like "1080".
+  const QUALITY = ["highres", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
+  const QUALITY_HEIGHT = { highres: 4320, hd2160: 2160, hd1440: 1440, hd1080: 1080, hd720: 720, large: 480, medium: 360, small: 240, tiny: 144 };
+
+  function pickQuality(available, target) {
+    const levels = QUALITY.filter((q) => available.includes(q));
+    if (!levels.length) return null;
+    if (target === "highest") return levels[0];
+    const max = Number(target);
+    return levels.find((q) => QUALITY_HEIGHT[q] <= max) || levels[levels.length - 1];
+  }
+
+  // Caption track to switch to. tracks: [{languageCode, kind}] from the player. Returns
+  // {track} to pick one, {translate: track} to auto-translate it, "off", or null to leave YouTube alone.
+  function pickSubtitles(tracks, want) {
+    if (want === "off") return "off";
+    if (want !== "no" && want !== "en") return null;
+    const codes = want === "no" ? ["nb", "no", "nn"] : ["en"];
+    const matches = (t) => codes.some((c) => (t.languageCode || "").toLowerCase().split("-")[0] === c);
+    const exact = tracks.filter(matches);
+    if (exact.length) return { track: exact.find((t) => t.kind !== "asr") || exact[0] };
+    if (!tracks.length) return null;
+    return { translate: tracks.find((t) => t.kind !== "asr") || tracks[0], to: want === "no" ? "no" : "en" };
+  }
+
+  // Next video for smart autoplay: first candidate not played, not watched and not the current one.
+  function pickNext(candidates, current, played, watched) {
+    return candidates.find((c) => c.id && c.id !== current && !played.has(c.id) && !watched.has(c.id)) || null;
+  }
+
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf,
+    videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;

@@ -25,11 +25,19 @@ A quiet YouTube home page. Hide what you never want to see, and set rules for th
 | Fewer views than | Videos below a view count you set |
 | **Members only** | **Always on.** Videos that look normal but need a paid channel membership |
 
-Works with YouTube in English and Norwegian. Settings live in the toolbar popup and apply
-immediately. The popup also counts what it hid on the current page, and why.
+The same filters can also run on Search, Subscriptions and the sidebar next to a video (one switch).
 
-> [!NOTE]
-> It only filters the home page (`youtube.com/`). Search, Subscriptions and watch pages are untouched.
+| Grid and playback | What it does |
+|---|---|
+| Videos per row | Fewer, bigger tiles (YouTube caps tiles at 700 px; this lifts it) |
+| Hide titles / channel names / views, date and likes | Thumbnail-only grid, if you want it |
+| No previews on hover | Thumbnails stay still; the inline preview player is hidden and paused |
+| Autoplay skips watched and repeats | When autoplay lands on a video you already played or watched, it jumps to the first new one in the sidebar |
+| Start at speed / quality, Theater mode | Applied once per video, so changing it by hand still works |
+| Subtitles | YouTube decides, always off, always Norwegian (auto-translated when there is no Norwegian track) or always English |
+
+Works with YouTube in English and Norwegian. Settings live in the toolbar popup and apply
+immediately. On a page the filters cover, the popup also counts what it hid, and why.
 
 ## Install
 
@@ -54,7 +62,8 @@ npm run dev       # run in a throwaway Firefox profile
 | File | Job |
 |---|---|
 | `src/parse.js` | Pure text reading: ages, view counts, badges. Tested |
-| `src/content.js` | Finds tiles and shelves on the page and hides the ones that match |
+| `src/content.js` | Finds tiles and shelves and hides the ones that match; smart autoplay; CSS switches |
+| `src/main.js` | Runs in the page itself to call the YouTube player (speed, quality, theater, subtitles) |
 | `popup/` | Settings and the "hidden on this page" counter |
 
 YouTube changes its page often. When something stops being hidden, the fix is usually a selector in

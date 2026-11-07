@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "YT Filter",
-  "version": "0.1.1",
-  "description": "Filters the YouTube home page: Shorts, members-only videos, old videos and more.",
+  "version": "0.2.0",
+  "description": "A calmer YouTube: hides Shorts, members-only and old videos, skips repeats in autoplay, and sets player defaults.",
   "browser_specific_settings": {
     "gecko": {
       "id": "yt-filter@loftspace",
@@ -18,6 +18,12 @@
       "matches": ["*://www.youtube.com/*"],
       "js": ["src/parse.js", "src/content.js"],
       "css": ["src/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["src/parse.js", "src/main.js"],
+      "world": "MAIN",
       "run_at": "document_idle"
     }
   ],
