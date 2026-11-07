@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YT Filter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Filters the YouTube home page: Shorts, members-only videos, old videos and more.",
   "browser_specific_settings": {
     "gecko": {
