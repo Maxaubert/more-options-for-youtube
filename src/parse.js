@@ -3,18 +3,19 @@
 (function (root) {
   "use strict";
 
+  // Defaults chosen by Max on 2026-11-07 for new users; personal settings start off.
   const DEFAULTS = {
     enabled: true,
-    membersMode: "always", // always | unlessSubscribed | never
+    membersMode: "unlessMember", // always | unlessMember | never
     shorts: true,
-    playables: true,
+    playables: false,
     news: true,
     live: false,
     mixes: false,
     playlists: false,
     watched: false,
     watchedPct: 50,
-    maxAge: true,
+    maxAge: false,
     maxAgeValue: 1,
     maxAgeUnit: "years",
     minViews: false,
@@ -28,7 +29,7 @@
     hideAvatars: false,
     hideMeta: false,
     // Playback
-    noPreview: true,
+    noPreview: false,
     smartAutoplay: true,
     speed: false,
     speedValue: "1.25",
@@ -36,7 +37,7 @@
     qualityValue: "highest",
     theater: false,
     subtitles: "default", // default | off | no | en
-    shortsAsVideo: true, // open Shorts in the normal player
+    shortsAsVideo: false, // open Shorts in the normal player
     noEndCards: false,
     noComments: false,
     // Block lists: one entry per line (or comma separated), matched without case
@@ -152,31 +153,38 @@
     return !!title && parseList(s.blockWords).some((w) => title.includes(w));
   }
 
-  // Members-only videos are hidden even with the master switch off, unless the user picked otherwise.
+  // Members-only videos: hidden unless the mode is "never", or "unlessMember" and the user pays for that channel.
   function hideMembers(info, s) {
-    if (!info.members || s.membersMode === "never") return false;
-    return !(s.membersMode === "unlessSubscribed" && info.subscribed);
+    if (!info.members || !s.enabled || s.membersMode === "never") return false;
+    return !(s.membersMode === "unlessMember" && info.member);
   }
 
-  // Whether a tile's channel is in the user's subscriptions: subs = {names: Set, handles: Set}, lower case.
-  function isSubscribed(info, subs) {
-    if (!subs) return false;
+  // Whether a tile's channel is in a channel list: list = {names: Set, handles: Set}, lower case.
+  function inChannelList(info, list) {
+    if (!list) return false;
     const name = (info.channel || "").trim().toLowerCase();
     const handle = (info.handle || "").toLowerCase();
-    return (!!name && subs.names.has(name)) || (!!handle && subs.handles.has(handle));
+    return (!!name && list.names.has(name)) || (!!handle && list.handles.has(handle));
   }
 
-  // Channel names and @handles from the HTML of youtube.com/feed/channels (the subscriptions list).
-  function parseSubscriptions(html) {
+  // Channel names and @handles from the HTML of youtube.com/paid_memberships (the user's channel memberships).
+  // The page layout is not documented, so every short plain text and every @handle counts; page headings in
+  // the list never match a real channel name on a tile.
+  function parseChannelList(html) {
     const names = new Set();
     const handles = new Set();
-    const nameRe = /"channelRenderer":\{"channelId":"[^"]+","title":\{"simpleText":"((?:[^"\\]|\\.)*)"/g;
-    for (const m of html.matchAll(nameRe)) names.add(JSON.parse('"' + m[1] + '"').toLowerCase());
+    for (const m of html.matchAll(/"simpleText":"((?:[^"\\]|\\.){1,80})"/g)) {
+      try {
+        names.add(JSON.parse('"' + m[1] + '"').trim().toLowerCase());
+      } catch {
+        // malformed escape: skip
+      }
+    }
     for (const m of html.matchAll(/"canonicalBaseUrl":"\/(@[^"]+)"/g)) handles.add(decodeURIComponent(m[1]).toLowerCase());
     return { names, handles };
   }
 
-  // info: {kind, members, subscribed, live, upcoming, ageDays, views, watchedPct, channel, handle, title}.
+  // info: {kind, members, member, live, upcoming, ageDays, views, watchedPct, channel, handle, title}.
   // Returns a REASONS key or null.
   function decideTile(info, s) {
     if (hideMembers(info, s)) return "members";
@@ -249,7 +257,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, hideMembers, isSubscribed, parseSubscriptions,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

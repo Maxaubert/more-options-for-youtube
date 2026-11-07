@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox and Zen: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.3.5](https://img.shields.io/badge/version-0.3.5-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.3.6](https://img.shields.io/badge/version-0.3.6-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff0000?style=flat-square)](manifest.json)
   [![No data collected](https://img.shields.io/badge/data%20collected-none-ff0000?style=flat-square)](#privacy)
@@ -28,8 +28,8 @@ sent anywhere.
 
 **Hide what you never want to see**
 - Shorts, Playables, news and trending rows, live and upcoming streams, mixes and playlists, one switch each.
-- Members-only videos: the ones that look normal until you click and hit a paywall. Always hide them, hide
-  them unless you subscribe to the channel, or show them.
+- Members-only videos: the ones that look normal until you click and hit a paywall. By default you only
+  see them from channels you are a paying member of; you can also always hide or always show them.
 - Videos older than an age you pick, with fewer views than a number you pick, or already watched past a
   percentage you pick.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
@@ -67,10 +67,12 @@ Needs Firefox or Zen 142 or newer.
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
   Block section (one per line). Remove a line to unblock.
-- **Turn it all off:** the switch at the top of the popup pauses every filter. Members-only videos follow
-  their own setting.
-- **Hide unless subscribed:** the add-on reads your own subscriptions page on YouTube once a day to know
-  which channels you follow. The list stays in your browser.
+- **Turn it all off:** the switch at the top of the popup pauses everything, so YouTube looks exactly as
+  normal.
+- **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
+  once a day to know which channels you pay for. The list stays in your browser.
+- **Defaults:** Shorts and news rows are hidden, autoplay skips repeats, and members-only videos show only
+  for your memberships. Everything else starts off.
 
 ## Privacy
 

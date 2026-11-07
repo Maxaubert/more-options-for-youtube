@@ -27,9 +27,9 @@
   // Smart autoplay memory: videos opened on this computer, and videos YouTube showed with a watched bar.
   const played = new Set();
   const watched = new Set();
-  // Subscribed channels, only needed for "Hide unless subscribed"; refreshed at most once a day.
-  let subs = null;
-  const SUBS_MAX_AGE = 24 * 3600 * 1000;
+  // Channels the user pays a membership for, only needed for "Show if member"; refreshed at most once a day.
+  let memberships = null;
+  const MEMBERSHIPS_MAX_AGE = 24 * 3600 * 1000;
 
   const texts = (el, sel) => [...el.querySelectorAll(sel)].map((n) => (n.textContent || "").trim()).filter(Boolean);
   const labels = (el, sel) => [...el.querySelectorAll(sel)].map((n) => n.getAttribute("aria-label")).filter(Boolean);
@@ -149,7 +149,7 @@
       if (tile.closest(`[${ATTR}]:not(${TILE})`)) continue; // inside a hidden shelf
       markParts(tile);
       const info = tileInfo(tile);
-      info.subscribed = Y.isSubscribed(info, subs);
+      info.member = Y.inChannelList(info, memberships);
       if (info.id && info.watchedPct != null && info.watchedPct >= settings.watchedPct) remember(watched, "ytfWatched", info.id);
       mark(tile, Y.decideTile(info, settings));
     }
@@ -298,29 +298,31 @@
 
   async function loadSettings() {
     settings = { ...Y.DEFAULTS, ...(await browser.storage.local.get(Y.DEFAULTS)) };
-    if (settings.membersMode === "unlessSubscribed") loadSubscriptions();
+    if (settings.membersMode === "unlessMember") loadMemberships();
     schedule();
   }
 
-  // Reads the subscriptions page with the user's own YouTube session (same site, nothing leaves YouTube).
-  let subsLoading = false;
-  async function loadSubscriptions() {
-    if (subsLoading) return;
-    subsLoading = true;
+  // Reads the memberships page with the user's own YouTube session (same site, nothing leaves YouTube).
+  let membershipsLoading = false;
+  async function loadMemberships() {
+    if (membershipsLoading) return;
+    membershipsLoading = true;
     try {
-      const { ytfSubs } = await browser.storage.local.get({ ytfSubs: null });
-      if (ytfSubs && Date.now() - ytfSubs.at < SUBS_MAX_AGE) {
-        subs = { names: new Set(ytfSubs.names), handles: new Set(ytfSubs.handles) };
+      const { ytfMemberships } = await browser.storage.local.get({ ytfMemberships: null });
+      if (ytfMemberships && Date.now() - ytfMemberships.at < MEMBERSHIPS_MAX_AGE) {
+        memberships = { names: new Set(ytfMemberships.names), handles: new Set(ytfMemberships.handles) };
       } else {
-        const html = await (await fetch("/feed/channels", { credentials: "include" })).text();
-        subs = Y.parseSubscriptions(html);
-        await browser.storage.local.set({ ytfSubs: { at: Date.now(), names: [...subs.names], handles: [...subs.handles] } });
+        const html = await (await fetch("/paid_memberships", { credentials: "include" })).text();
+        memberships = Y.parseChannelList(html);
+        await browser.storage.local.set({
+          ytfMemberships: { at: Date.now(), names: [...memberships.names], handles: [...memberships.handles] },
+        });
       }
       schedule();
     } catch {
-      // Logged out or the page changed: treat as no subscriptions, so members-only videos stay hidden.
+      // Logged out or the page changed: no memberships known, so members-only videos stay hidden.
     } finally {
-      subsLoading = false;
+      membershipsLoading = false;
     }
   }
 
