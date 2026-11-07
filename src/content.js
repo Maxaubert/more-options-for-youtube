@@ -95,6 +95,23 @@
   // Only the outermost match: a yt-lockup-view-model inside a ytd-rich-item-renderer is the same video.
   const outermost = (root, sel) => [...root.querySelectorAll(sel)].filter((el) => !el.parentElement.closest(sel));
 
+  // Label each piece of the text under a tile as channel or meta (views/date), and each line as
+  // channel, meta or mixed, so the "hide channel names" and "hide views" switches hit the right one.
+  const setAttr = (el, name, value) => {
+    if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  };
+  function markParts(tile) {
+    for (const row of tile.querySelectorAll('[class*="ContentMetadataViewModelMetadataRow"]')) {
+      const kinds = new Set();
+      for (const span of row.querySelectorAll('[class*="MetadataText"]')) {
+        const kind = Y.isMetaText(span.getAttribute("aria-label") || span.textContent) ? "meta" : "channel";
+        setAttr(span, "data-ytf-part", kind);
+        kinds.add(kind);
+      }
+      if (kinds.size) setAttr(row, "data-ytf-row", kinds.size > 1 ? "mixed" : [...kinds][0]);
+    }
+  }
+
   function mark(el, reason) {
     if (reason) {
       if (el.getAttribute(ATTR) !== reason) el.setAttribute(ATTR, reason);
@@ -116,6 +133,7 @@
     // YouTube recycles tile elements with new videos, so every tile is checked on every pass.
     for (const tile of outermost(root, TILE)) {
       if (tile.closest(`[${ATTR}]:not(${TILE})`)) continue; // inside a hidden shelf
+      markParts(tile);
       const info = tileInfo(tile);
       if (info.id && info.watchedPct != null && info.watchedPct >= settings.watchedPct) remember(watched, "ytfWatched", info.id);
       mark(tile, Y.decideTile(info, settings));
@@ -129,6 +147,7 @@
       "data-ytf-nopreview": on && settings.noPreview,
       "data-ytf-hidetitles": on && settings.hideTitles,
       "data-ytf-hidechannels": on && settings.hideChannels,
+      "data-ytf-hideavatars": on && settings.hideAvatars,
       "data-ytf-hidemeta": on && settings.hideMeta,
       "data-ytf-perrow": on && settings.perRow,
     };

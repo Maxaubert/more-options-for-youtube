@@ -15,21 +15,30 @@ html[data-ytf-perrow] ytd-rich-grid-renderer {
   --ytd-rich-grid-item-max-width: 100vw !important; /* YouTube caps tiles at 700px; 1-2 per row needs more */
 }
 
-/* Tile text. New lockups have two metadata rows: channel, then views and date. Channel pages show only
-   the second, so the last row is always views and date. */
+/* Tile text. Which metadata line is the channel and which is views/date differs per page and layout,
+   so content.js reads the text and marks each part data-ytf-part / data-ytf-row = channel | meta (| mixed). */
 html[data-ytf-hidetitles] :is(ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer, yt-lockup-view-model)
   :is(#video-title, #video-title-link, h3[class*="LockupMetadataViewModelHeading"], a[class*="LockupMetadataViewModelTitle"]) {
   display: none !important;
 }
 
 html[data-ytf-hidechannels] :is(ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer, yt-lockup-view-model)
-  :is(ytd-channel-name, #channel-info, #avatar-link, #avatar-container, yt-decorated-avatar-view-model, [class*="LockupMetadataViewModelAvatar"],
-    [class*="ContentMetadataViewModelMetadataRow"]:first-child:not(:last-child)) {
+  :is(ytd-channel-name, [data-ytf-part="channel"], [data-ytf-row="channel"]) {
+  display: none !important;
+}
+
+html[data-ytf-hideavatars] :is(ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer, yt-lockup-view-model)
+  :is(#avatar-link, #avatar-container, #channel-thumbnail, yt-decorated-avatar-view-model, [class*="LockupMetadataViewModelAvatar"]) {
   display: none !important;
 }
 
 html[data-ytf-hidemeta] :is(ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer, yt-lockup-view-model)
-  :is(#metadata-line, [class*="ContentMetadataViewModelMetadataRow"]:last-child) {
+  :is(#metadata-line, [data-ytf-part="meta"], [data-ytf-row="meta"]) {
+  display: none !important;
+}
+
+/* A line holding both channel and views/date: drop the dots once either half is hidden. */
+html:is([data-ytf-hidechannels], [data-ytf-hidemeta]) [data-ytf-row="mixed"] [class*="MetadataViewModelDelimiter"] {
   display: none !important;
 }
 
