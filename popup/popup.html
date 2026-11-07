@@ -6,7 +6,7 @@
 </head>
 <body>
   <header>
-    <h1>YT Filter</h1>
+    <h1>More Options</h1>
     <label class="switch" title="Turn all filters on or off">
       <input type="checkbox" data-key="enabled">
       <span></span>
@@ -97,6 +97,9 @@
       </div>
     </div>
     <label class="row"><span>Theater mode</span><input type="checkbox" data-key="theater"></label>
+    <label class="row"><span>Open Shorts in the normal player</span><input type="checkbox" data-key="shortsAsVideo"></label>
+    <label class="row"><span>Hide end cards</span><input type="checkbox" data-key="noEndCards"></label>
+    <label class="row"><span>Hide comments</span><input type="checkbox" data-key="noComments"></label>
     <div class="row select-row">
       <span>Subtitles</span>
       <select data-key="subtitles" aria-label="Subtitles">
@@ -106,6 +109,19 @@
         <option value="en">Always English</option>
       </select>
     </div>
+  </section>
+
+  <section>
+    <h2>Block</h2>
+    <label class="field">
+      <span>Channels, one per line</span>
+      <textarea data-key="blockChannels" rows="3" spellcheck="false" placeholder="Channel name or @handle"></textarea>
+    </label>
+    <label class="field">
+      <span>Words in titles, one per line</span>
+      <textarea data-key="blockWords" rows="3" spellcheck="false" placeholder="e.g. reaction"></textarea>
+    </label>
+    <p class="hint">Tip: a video's ⋮ menu has "Block channel" too.</p>
   </section>
 
   <footer id="stats" hidden></footer>
