@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox and Zen: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.3.5](https://img.shields.io/badge/version-0.3.5-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.3.6](https://img.shields.io/badge/version-0.3.6-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff0000?style=flat-square)](manifest.json)
   [![No data collected](https://img.shields.io/badge/data%20collected-none-ff0000?style=flat-square)](#privacy)
@@ -69,7 +69,7 @@ Needs Firefox or Zen 142 or newer.
   Block section (one per line). Remove a line to unblock.
 - **Turn it all off:** the switch at the top of the popup pauses every filter. Members-only videos follow
   their own setting.
-- **Hide unless subscribed:** the add-on reads your own subscriptions page on YouTube once a day to know
+- **Show if subscribed:** the add-on reads your own subscriptions page on YouTube once a day to know
   which channels you follow. The list stays in your browser.
 
 ## Privacy
