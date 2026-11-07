@@ -49,14 +49,25 @@ locally by your browser.
 |---|---|
 | Categories | Appearance; Photos, Music & Videos |
 | Tags | youtube, shorts, filter, autoplay, accessibility |
-| License | TODO (Max to pick: MIT is common for a public add-on) |
+| License | MIT (`LICENSE`) |
 | Privacy policy | Not required: the add-on collects no data (`data_collection_permissions: none` in the manifest) |
-| Support | TODO: an email or the GitHub issues page if the repo goes public |
+| Support | None for now (Max, 2026-11-07) |
 | Source code | Not needed: the code is not minified or bundled |
+| Screenshots | `docs/store/screenshot-1.png` to `-3.png` (1280x800, made from the real popup) |
 
 ## Still to do before submitting
 
 - [x] Icon: Max's play + plus (icons/icon.svg). Note: close to the YouTube logo; Max chose to submit it as is and change it if review objects
-- [ ] Screenshots: popup, home page before and after (1280x800)
-- [ ] License and support contact
-- [ ] Max reviews this text and submits on addons.mozilla.org
+- [x] Screenshots (docs/store/)
+- [x] License (MIT) and support contact (none)
+- [x] Max reviewed a local preview of the page (2026-11-07)
+- [ ] Max submits on addons.mozilla.org
+
+## How to submit (Max does this)
+
+The add-on already exists on AMO as unlisted (same ID, `yt-filter@loftspace`), so the public listing is a new
+version of it. Every upload needs a version number AMO has not seen; the unlisted ones used 0.1.0 to 0.3.1.
+
+1. Build the upload file: `npm run build` (makes `web-ext-artifacts/more_options_for_youtube-<version>.zip`).
+2. AMO Developer Hub → My Add-ons → More Options for YouTube → Upload New Version → "On this site".
+3. Upload the zip, answer "No" to the source code question, and fill in the listing from this file.
