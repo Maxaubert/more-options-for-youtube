@@ -56,7 +56,7 @@ locally by your browser.
 
 ## Still to do before submitting
 
-- [ ] Icon: final design (128 px and up, works on light and dark)
+- [x] Icon: Max's play + plus (icons/icon.svg). Note: close to the YouTube logo; Max chose to submit it as is and change it if review objects
 - [ ] Screenshots: popup, home page before and after (1280x800)
 - [ ] License and support contact
 - [ ] Max reviews this text and submits on addons.mozilla.org
