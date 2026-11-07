@@ -27,6 +27,9 @@
   // Smart autoplay memory: videos opened on this computer, and videos YouTube showed with a watched bar.
   const played = new Set();
   const watched = new Set();
+  // Subscribed channels, only needed for "Hide unless subscribed"; refreshed at most once a day.
+  let subs = null;
+  const SUBS_MAX_AGE = 24 * 3600 * 1000;
 
   const texts = (el, sel) => [...el.querySelectorAll(sel)].map((n) => (n.textContent || "").trim()).filter(Boolean);
   const labels = (el, sel) => [...el.querySelectorAll(sel)].map((n) => n.getAttribute("aria-label")).filter(Boolean);
@@ -146,6 +149,7 @@
       if (tile.closest(`[${ATTR}]:not(${TILE})`)) continue; // inside a hidden shelf
       markParts(tile);
       const info = tileInfo(tile);
+      info.subscribed = Y.isSubscribed(info, subs);
       if (info.id && info.watchedPct != null && info.watchedPct >= settings.watchedPct) remember(watched, "ytfWatched", info.id);
       mark(tile, Y.decideTile(info, settings));
     }
@@ -294,7 +298,30 @@
 
   async function loadSettings() {
     settings = { ...Y.DEFAULTS, ...(await browser.storage.local.get(Y.DEFAULTS)) };
+    if (settings.membersMode === "unlessSubscribed") loadSubscriptions();
     schedule();
+  }
+
+  // Reads the subscriptions page with the user's own YouTube session (same site, nothing leaves YouTube).
+  let subsLoading = false;
+  async function loadSubscriptions() {
+    if (subsLoading) return;
+    subsLoading = true;
+    try {
+      const { ytfSubs } = await browser.storage.local.get({ ytfSubs: null });
+      if (ytfSubs && Date.now() - ytfSubs.at < SUBS_MAX_AGE) {
+        subs = { names: new Set(ytfSubs.names), handles: new Set(ytfSubs.handles) };
+      } else {
+        const html = await (await fetch("/feed/channels", { credentials: "include" })).text();
+        subs = Y.parseSubscriptions(html);
+        await browser.storage.local.set({ ytfSubs: { at: Date.now(), names: [...subs.names], handles: [...subs.handles] } });
+      }
+      schedule();
+    } catch {
+      // Logged out or the page changed: treat as no subscriptions, so members-only videos stay hidden.
+    } finally {
+      subsLoading = false;
+    }
   }
 
   browser.storage.onChanged.addListener((changes, area) => {

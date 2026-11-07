@@ -5,6 +5,7 @@
 
   const DEFAULTS = {
     enabled: true,
+    membersMode: "always", // always | unlessSubscribed | never
     shorts: true,
     playables: true,
     news: true,
@@ -151,9 +152,34 @@
     return !!title && parseList(s.blockWords).some((w) => title.includes(w));
   }
 
-  // info: {kind, members, live, upcoming, ageDays, views, watchedPct, channel, handle, title}. Returns a REASONS key or null.
+  // Members-only videos are hidden even with the master switch off, unless the user picked otherwise.
+  function hideMembers(info, s) {
+    if (!info.members || s.membersMode === "never") return false;
+    return !(s.membersMode === "unlessSubscribed" && info.subscribed);
+  }
+
+  // Whether a tile's channel is in the user's subscriptions: subs = {names: Set, handles: Set}, lower case.
+  function isSubscribed(info, subs) {
+    if (!subs) return false;
+    const name = (info.channel || "").trim().toLowerCase();
+    const handle = (info.handle || "").toLowerCase();
+    return (!!name && subs.names.has(name)) || (!!handle && subs.handles.has(handle));
+  }
+
+  // Channel names and @handles from the HTML of youtube.com/feed/channels (the subscriptions list).
+  function parseSubscriptions(html) {
+    const names = new Set();
+    const handles = new Set();
+    const nameRe = /"channelRenderer":\{"channelId":"[^"]+","title":\{"simpleText":"((?:[^"\\]|\\.)*)"/g;
+    for (const m of html.matchAll(nameRe)) names.add(JSON.parse('"' + m[1] + '"').toLowerCase());
+    for (const m of html.matchAll(/"canonicalBaseUrl":"\/(@[^"]+)"/g)) handles.add(decodeURIComponent(m[1]).toLowerCase());
+    return { names, handles };
+  }
+
+  // info: {kind, members, subscribed, live, upcoming, ageDays, views, watchedPct, channel, handle, title}.
+  // Returns a REASONS key or null.
   function decideTile(info, s) {
-    if (info.members) return "members";
+    if (hideMembers(info, s)) return "members";
     if (!s.enabled) return null;
     if (isBlocked(info, s)) return "blocked";
     if (info.kind === "shorts" && s.shorts) return "shorts";
@@ -223,7 +249,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, hideMembers, isSubscribed, parseSubscriptions,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

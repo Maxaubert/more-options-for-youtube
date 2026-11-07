@@ -116,6 +116,28 @@ test("channel vs views/date text", () => {
   }
 });
 
+test("members-only modes", () => {
+  const m = video({ members: true, channel: "Vsauce" });
+  assert.equal(Y.decideTile(m, S), "members");
+  assert.equal(Y.decideTile(m, { ...S, membersMode: "never" }), null);
+  assert.equal(Y.decideTile(m, { ...S, membersMode: "unlessSubscribed" }), "members");
+  assert.equal(Y.decideTile({ ...m, subscribed: true }, { ...S, membersMode: "unlessSubscribed" }), null);
+  assert.equal(Y.decideTile({ ...m, subscribed: true }, S), "members");
+});
+
+test("subscriptions page", () => {
+  const html =
+    '..."channelRenderer":{"channelId":"UC1","title":{"simpleText":"Vsauce"},"navigationEndpoint":{"browseEndpoint":{"canonicalBaseUrl":"/@Vsauce"}}}' +
+    '..."channelRenderer":{"channelId":"UC2","title":{"simpleText":"Tom \\"Quotes\\" Scott"},"x":{"canonicalBaseUrl":"/@TomScott"}}';
+  const subs = Y.parseSubscriptions(html);
+  assert.deepEqual([...subs.names], ["vsauce", 'tom "quotes" scott']);
+  assert.deepEqual([...subs.handles], ["@vsauce", "@tomscott"]);
+  assert.ok(Y.isSubscribed({ channel: "VSAUCE" }, subs));
+  assert.ok(Y.isSubscribed({ channel: "x", handle: "@TomScott" }, subs));
+  assert.ok(!Y.isSubscribed({ channel: "Other" }, subs));
+  assert.ok(!Y.isSubscribed({ channel: "Vsauce" }, null));
+});
+
 test("block lists", () => {
   assert.deepEqual(Y.parseList("Linus Tech Tips\nMrBeast, clickbait\n\n mrbeast "), ["linus tech tips", "mrbeast", "clickbait"]);
   const s = { ...S, blockChannels: "MrBeast\n@somehandle", blockWords: "reaction" };

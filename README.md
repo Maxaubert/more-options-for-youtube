@@ -5,13 +5,14 @@
 
   A calmer YouTube for Firefox and Zen: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.3.4](https://img.shields.io/badge/version-0.3.4-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.3.5](https://img.shields.io/badge/version-0.3.5-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff0000?style=flat-square)](manifest.json)
   [![No data collected](https://img.shields.io/badge/data%20collected-none-ff0000?style=flat-square)](#privacy)
   [![Licence: MIT](https://img.shields.io/badge/licence-MIT-ff0000?style=flat-square)](LICENSE)
+  [![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff0000?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/maxaubert)
 
-  [Install](#install) · [Features](#features) · [Store listing draft](docs/store-listing.md)
+  [Install](#install) · [Features](#features) · [Support](#support) · [Store listing draft](docs/store-listing.md)
 </div>
 
 YouTube decides a lot for you: Shorts everywhere, videos that turn out to be members-only, autoplay that
@@ -27,7 +28,8 @@ sent anywhere.
 
 **Hide what you never want to see**
 - Shorts, Playables, news and trending rows, live and upcoming streams, mixes and playlists, one switch each.
-- Members-only videos, always: the ones that look normal until you click and hit a paywall.
+- Members-only videos: the ones that look normal until you click and hit a paywall. Always hide them, hide
+  them unless you subscribe to the channel, or show them.
 - Videos older than an age you pick, with fewer views than a number you pick, or already watched past a
   percentage you pick.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
@@ -65,8 +67,10 @@ Needs Firefox or Zen 142 or newer.
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
   Block section (one per line). Remove a line to unblock.
-- **Turn it all off:** the switch at the top of the popup pauses every filter. Members-only videos stay
-  hidden.
+- **Turn it all off:** the switch at the top of the popup pauses every filter. Members-only videos follow
+  their own setting.
+- **Hide unless subscribed:** the add-on reads your own subscriptions page on YouTube once a day to know
+  which channels you follow. The list stays in your browser.
 
 ## Privacy
 
@@ -95,6 +99,12 @@ npm run build     # zip for the store, in web-ext-artifacts/
 When something stops being hidden, the fix is usually a selector in `src/content.js` or a phrase in
 `src/parse.js`; add a test for it. Private signed builds use `scripts/sign.py` (Mozilla API keys from
 Windows Credential Manager, never printed or stored in the repo).
+
+## Support
+
+More Options for YouTube is free. If it makes YouTube better for you, a coffee helps keep it going.
+
+<a href="https://ko-fi.com/maxaubert"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" height="36"></a>
 
 ## Licence
 

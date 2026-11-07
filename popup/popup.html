@@ -21,7 +21,14 @@
     <label class="row"><span>Live and upcoming</span><input type="checkbox" data-key="live"></label>
     <label class="row"><span>Mixes</span><input type="checkbox" data-key="mixes"></label>
     <label class="row"><span>Playlists</span><input type="checkbox" data-key="playlists"></label>
-    <div class="row locked"><span>Members only</span><em>Always</em></div>
+    <div class="row select-row">
+      <span>Members-only videos</span>
+      <select data-key="membersMode" aria-label="Members-only videos">
+        <option value="always">Always hide</option>
+        <option value="unlessSubscribed">Hide unless subscribed</option>
+        <option value="never">Show</option>
+      </select>
+    </div>
   </section>
 
   <section>
