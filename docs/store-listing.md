@@ -1,7 +1,7 @@
 # Store listing draft (addons.mozilla.org)
 
 Draft for the public listing. **Max submits it himself**; nothing here is uploaded automatically.
-Status 2026-11-07: text drafted, icon and screenshots still to do.
+Status 2026-11-07: submitted for public review (0.3.3).
 
 ## Name
 
@@ -64,7 +64,8 @@ reports and ideas are welcome there.
 - [x] Screenshots (docs/store/)
 - [x] License (MIT) and support contact (none)
 - [x] Max reviewed a local preview of the page (2026-11-07)
-- [ ] Max submits on addons.mozilla.org
+- [x] Submitted for review 2026-11-07: version 0.3.3, listed, MIT, categories Appearance + Photos, Music & Videos (status "nominated")
+- [ ] Screenshots on AMO (Edit Product Page > Media) and Contributions URL https://ko-fi.com/maxaubert
 
 ## How to submit (Max does this)
 
