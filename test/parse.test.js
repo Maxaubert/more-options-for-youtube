@@ -106,6 +106,16 @@ test("unknown age or views never hides", () => {
   assert.equal(Y.decideTile(video({ ageDays: null, views: null }), s), null);
 });
 
+test("channel vs views/date text", () => {
+  for (const meta of ["9.7 million views", "9.7M", "9y ago", "9 years ago", "108 avspillinger", "108", "for 2 d. siden",
+    "1.2K watching", "Streamed 3 days ago", "Premieres 12/11/26", "Strømmet for 2 år siden"]) {
+    assert.ok(Y.isMetaText(meta), meta);
+  }
+  for (const channel of ["3Blue1Brown", "NRK", "Veritasium", "Kurzgesagt – In a Nutshell", "Linus Tech Tips"]) {
+    assert.ok(!Y.isMetaText(channel), channel);
+  }
+});
+
 test("video ids", () => {
   assert.equal(Y.videoIdFromHref("/watch?v=KfODG5REyss"), "KfODG5REyss");
   assert.equal(Y.videoIdFromHref("/watch?v=NiCgcUTL9_Q&pp=0gcJ"), "NiCgcUTL9_Q");

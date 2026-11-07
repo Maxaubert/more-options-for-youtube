@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YT Filter",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A calmer YouTube: hides Shorts, members-only and old videos, skips repeats in autoplay, and sets player defaults.",
   "browser_specific_settings": {
     "gecko": {

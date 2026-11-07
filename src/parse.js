@@ -24,6 +24,7 @@
     perRowValue: 3,
     hideTitles: false,
     hideChannels: false,
+    hideAvatars: false,
     hideMeta: false,
     // Playback
     noPreview: true,
@@ -145,6 +146,14 @@
     return null;
   }
 
+  // One piece of the line under a tile: views, date, live or premiere info ("meta"), or else the channel.
+  // The screen can show short forms ("9.7M", "9y ago"), so plain numbers and "ago" count as meta too.
+  const META_WORDS = /\b(ago|streamed|premiered|premieres|views?|watching|scheduled)\b|siden|strømmet|visninger|avspillinger|premiere|ser på/i;
+  function isMetaText(text) {
+    if (!text) return false;
+    return parseViews(text) != null || parseAgeDays(text) != null || META_WORDS.test(text) || /^\d[\d.,\s]*[kmb]?$/i.test(text.trim());
+  }
+
   function videoIdFromHref(href) {
     if (!href) return null;
     const m = /[?&]v=([\w-]{11})|\/shorts\/([\w-]{11})/.exec(href);
@@ -185,7 +194,7 @@
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf,
-    videoIdFromHref, pickQuality, pickSubtitles, pickNext,
+    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;
