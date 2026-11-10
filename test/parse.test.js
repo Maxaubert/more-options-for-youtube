@@ -147,20 +147,38 @@ test("block lists", () => {
   assert.equal(Y.decideTile(video({ channel: "MrBeast" }), { ...s, enabled: false }), null);
 });
 
-test("channel title filters", () => {
-  assert.deepEqual(Y.parseKeepOnly("Gameranx: *Before you buy* | Review\nno colon\nEmpty:  \n@Handle: a: b"), [
-    { channel: "gameranx", words: ["before you buy", "review"] },
-    { channel: "@handle", words: ["a: b"] },
+test("title rules", () => {
+  const lines = (...l) => l.join("\n");
+  assert.deepEqual(Y.parseTitleRules(lines("reaction, Clickbait", '@any "Shorts"', '@Some Channel "top 10" "*Ranked*"', '@chan only "review"', "@x word", "@nothing")), [
+    { channel: null, only: false, words: ["reaction", "clickbait"] },
+    { channel: null, only: false, words: ["shorts"] },
+    { channel: "@some channel", only: false, words: ["top 10", "ranked"] },
+    { channel: "@chan", only: true, words: ["review"] },
+    { channel: "@x", only: false, words: ["word"] },
   ]);
-  const s = { ...S, keepOnly: "Gameranx: *Before you buy*\n@otherhandle: tutorial" };
-  const g = (title) => video({ channel: "GameRanx", title });
-  assert.equal(Y.decideTile(g("Elden Ring - Before You Buy"), s), null);
-  assert.equal(Y.decideTile(g("Top 10 Games of 2026"), s), "keepOnly");
-  assert.equal(Y.decideTile(g(""), s), null);
-  assert.equal(Y.decideTile(video({ channel: "Someone else", title: "Top 10 Games" }), s), null);
-  assert.equal(Y.decideTile(video({ channel: "X", handle: "@OtherHandle", title: "Vlog" }), s), "keepOnly");
-  assert.equal(Y.decideTile(video({ channel: "X", handle: "@OtherHandle", title: "Rust tutorial" }), s), null);
-  assert.equal(Y.decideTile(g("Top 10 Games of 2026"), { ...s, enabled: false }), null);
+  const s = { ...S, blockWords: lines("reaction", '@any "shorts"', '@Some Channel "top 10"', '@chan only "review" "before you buy"') };
+  const c = (title, extra) => video({ channel: "Chan", title, ...extra });
+  assert.equal(Y.decideTile(video({ title: "My REACTION" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ title: "Best shorts ever" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ channel: "Some Channel", title: "Top 10 games" }), s), "blocked");
+  assert.equal(Y.decideTile(video({ channel: "Other", title: "Top 10 games" }), s), null);
+  assert.equal(Y.decideTile(c("Game X - Before You Buy"), s), null);
+  assert.equal(Y.decideTile(c("Game X review"), s), null);
+  assert.equal(Y.decideTile(c("Top 10 games"), s), "keepOnly");
+  assert.equal(Y.decideTile(c(""), s), null);
+  assert.equal(Y.decideTile(video({ channel: "X", handle: "@Chan", title: "Vlog" }), s), "keepOnly");
+  assert.equal(Y.decideTile(c("Top 10 games"), { ...s, enabled: false }), null);
+});
+
+test("0.3.8 keep-only lines move into the Titles field", () => {
+  assert.equal(Y.migrateKeepOnly({ keepOnly: "", blockWords: "x" }), null);
+  assert.deepEqual(Y.migrateKeepOnly({ keepOnly: "Chan: *Before you buy* | Review\nno colon", blockWords: "reaction\n" }), {
+    keepOnly: "",
+    blockWords: 'reaction\n@Chan only "before you buy" "review"',
+  });
+  const moved = Y.migrateKeepOnly({ keepOnly: "@chan: review", blockWords: "" });
+  assert.equal(moved.blockWords, '@chan only "review"');
+  assert.equal(Y.decideTile(video({ channel: "Chan", title: "Vlog" }), { ...S, ...moved }), "keepOnly");
 });
 
 test("video ids", () => {

@@ -23,7 +23,7 @@ A calmer YouTube, on your terms.
 - Videos older than an age you pick, or with fewer views than a number you pick
 - Videos you have already watched
 - Channels and title words you list, or straight from a video's ⋮ menu with "Block channel"
-- Keep only some videos from a channel, for example only the "Before you buy" videos from Gameranx
+- Title rules per channel: block some titles from one channel, or keep only one series from it
 
 Works on the home page, and if you like on Search, Subscriptions and the list next to a video.
 

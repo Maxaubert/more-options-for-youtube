@@ -298,6 +298,11 @@
 
   async function loadSettings() {
     settings = { ...Y.DEFAULTS, ...(await browser.storage.local.get(Y.DEFAULTS)) };
+    const moved = Y.migrateKeepOnly(settings);
+    if (moved) {
+      Object.assign(settings, moved);
+      browser.storage.local.set(moved); // triggers one more loadSettings, which finds nothing to move
+    }
     if (settings.membersMode === "unlessMember") loadMemberships();
     schedule();
   }

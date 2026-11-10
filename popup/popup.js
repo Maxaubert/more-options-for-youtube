@@ -4,6 +4,17 @@
   const Y = globalThis.YTF;
   const inputs = [...document.querySelectorAll("[data-key]")];
   const settings = { ...Y.DEFAULTS, ...(await browser.storage.local.get(Y.DEFAULTS)) };
+  const moved = Y.migrateKeepOnly(settings);
+  if (moved) {
+    Object.assign(settings, moved);
+    await browser.storage.local.set(moved);
+  }
+
+  // Text boxes grow with their text instead of showing a resize handle.
+  const fit = (el) => {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + 2 + "px";
+  };
 
   function read(el) {
     if (el.type === "checkbox") return el.checked;
@@ -18,6 +29,10 @@
     const v = settings[el.dataset.key];
     if (el.type === "checkbox") el.checked = v;
     else el.value = v;
+    if (el.tagName === "TEXTAREA") {
+      fit(el);
+      el.addEventListener("input", () => fit(el));
+    }
     el.addEventListener("change", async () => {
       await browser.storage.local.set({ [el.dataset.key]: read(el) });
       document.body.classList.toggle("off", !document.querySelector('[data-key="enabled"]').checked);
