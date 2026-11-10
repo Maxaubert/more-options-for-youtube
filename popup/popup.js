@@ -93,11 +93,16 @@
   }
 
   // --- Inputs ---------------------------------------------------------------------------------
+  // A number box keeps to its min and max (the browser does not enforce them outside a form).
+  // An empty or broken value falls back to the saved one.
   function read(el) {
     if (el.type === "checkbox") return el.checked;
     if (el.type === "number") {
       const n = Number(el.value);
-      return Number.isFinite(n) && el.value !== "" ? n : Y.DEFAULTS[el.dataset.key];
+      if (el.value === "" || !Number.isFinite(n)) return settings[el.dataset.key];
+      const min = el.min === "" ? -Infinity : Number(el.min);
+      const max = el.max === "" ? Infinity : Number(el.max);
+      return Math.min(max, Math.max(min, Math.round(n)));
     }
     return el.value;
   }
@@ -111,7 +116,22 @@
       readBack(el);
       el.addEventListener("input", () => readBack(el));
     }
-    el.addEventListener("change", () => save({ [el.dataset.key]: read(el) }));
+    el.addEventListener("change", () => {
+      const v = read(el);
+      if (el.type === "number") el.value = v; // show the clamped value
+      save({ [el.dataset.key]: v });
+    });
+    // Typed text is saved while typing too: the popup can close before "change" fires.
+    if (el.tagName === "TEXTAREA" || el.type === "number") {
+      let t = 0;
+      el.addEventListener("input", () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if (el.type === "number" && (el.value === "" || !Number.isFinite(Number(el.value)))) return;
+          save({ [el.dataset.key]: read(el) });
+        }, 300);
+      });
+    }
   }
 
   // --- Segmented button groups ----------------------------------------------------------------

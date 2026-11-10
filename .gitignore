@@ -3,3 +3,5 @@ web-ext-artifacts/
 *.xpi
 .amo-upload-uuid
 dist/
+__pycache__/
+*.pyc

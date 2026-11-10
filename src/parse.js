@@ -212,7 +212,7 @@
         const keyword = (KEYWORD.exec(head) || [])[2];
         const only = !!keyword && keyword.toLowerCase() !== "hide";
         const name = keyword ? head.replace(KEYWORD, "").trim().toLowerCase() : full;
-        if (!words.length || (!name && !only)) continue;
+        if (!words.length || !name) continue; // @show "x" has no channel name: skip it, so it never filters everything
         rules.push({ channel: !name || name === "any" ? null : "@" + name, only, words });
         if (keyword && name) rules.push({ channel: "@" + full, only: false, words });
       }
@@ -368,7 +368,7 @@
     if (tile && tile.watchedPct != null) return "watched";
     if (tile && tile.reason) return "hidden";
     if (video && video.title) {
-      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "" }, settings);
+      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
       if (reason === "blocked" || reason === "keepOnly") return "hidden";
     }
     return null;

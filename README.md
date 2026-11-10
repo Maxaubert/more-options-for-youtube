@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.5.2](https://img.shields.io/badge/version-0.5.2-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.5.3](https://img.shields.io/badge/version-0.5.3-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
   [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
@@ -14,7 +14,7 @@
   [![Licence: MIT](https://img.shields.io/badge/licence-MIT-ff0000?style=flat-square)](LICENSE)
   [![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff0000?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/maxaubert)
 
-  [Install](#install) · [Features](#features) · [Support](#support) · [Store listing draft](docs/store-listing.md)
+  [Install](#install) · [Features](#features) · [Support](#support) · [Store text](docs/store-listing.md)
 </div>
 
 YouTube decides a lot for you: Shorts everywhere, videos that turn out to be members-only, autoplay that
@@ -23,7 +23,7 @@ for YouTube gives each of those a switch. Everything runs in your browser, with 
 sent anywhere.
 
 <p align="center">
-  <img src="docs/store/screenshot-1.png" alt="The popup: hide switches and rules" width="640">
+  <img src="docs/store/screenshot-1.png" alt="The popup, Hide tab" width="640">
 </p>
 
 ## Features
@@ -54,9 +54,11 @@ Reads YouTube in English and Norwegian. The popup uses large, high-contrast type
 
 ## Install
 
-**From the store:** coming soon on addons.mozilla.org (submitted for review).
+**From the stores:** both are in review (November 2026).
+- Firefox and Zen: addons.mozilla.org
+- Chrome and Edge: [Chrome Web Store](https://chromewebstore.google.com/detail/igjngbapajhfjnbldgacaajdccpfnfcp)
 
-**From source** (for testing):
+**Firefox and Zen, from source:**
 1. `npm install`
 2. `npm run dev` opens a throwaway Firefox profile with the add-on loaded, or load `manifest.json` from
    `about:debugging` → This Firefox → Load Temporary Add-on (removed again when the browser restarts).
@@ -89,7 +91,8 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 - **Turn it all off:** the switch at the top of the popup pauses everything, so YouTube looks exactly as
   normal.
 - **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
-  once a day to know which channels you pay for. The list stays in your browser.
+  once a day to know which channels you pay for. The list stays in your browser. When you are logged out,
+  it does not save an answer.
 - **Defaults:** Shorts and news rows are hidden, autoplay skips repeats, and members-only videos show only
   for your memberships. Everything else starts off.
 
@@ -103,26 +106,22 @@ Settings and the list of played videos (for smart autoplay) are stored locally b
 
 - YouTube changes its page often; a filter can stop working until a selector is updated.
 - Default quality and subtitles use YouTube's player API, which YouTube can change without notice.
-- Firefox and Zen are tested daily. Chrome and Safari run the same code but are tested less; Safari needs
-  Xcode on a Mac, and is not in the App Store.
+- Firefox and Zen get the most testing. Chrome and Safari run the same code.
+- Safari is not in the App Store. You build it on a Mac with Xcode.
 
 ## Development
 
-Plain JavaScript, no build step for Firefox (`npm run build:chrome` only copies files and trims the
-manifest for Chrome and Safari). `src/compat.js` lets Chrome use the same `browser` API; `src/parse.js` holds the pure text reading (ages, view counts, badges,
-rules) and is covered by tests; `src/content.js` finds tiles on the page and hides them; `src/main.js`
-runs inside the page to talk to the YouTube player; `popup/` is the settings window.
+Plain JavaScript, no bundler. [CLAUDE.md](CLAUDE.md) has the file map, the commands and the release steps.
 
 ```bash
-npm test          # parser and rule tests (node:test, no browser)
-npm run lint      # web-ext lint
-npm run dev       # run in a throwaway Firefox profile
-npm run build     # zip for the store, in web-ext-artifacts/
+npm test               # parser and rule tests (node:test, no browser)
+npm run lint           # web-ext lint
+npm run dev            # run in a throwaway Firefox profile
+npm run build:chrome   # dist/chrome and a Chrome zip
 ```
 
 When something stops being hidden, the fix is usually a selector in `src/content.js` or a phrase in
-`src/parse.js`; add a test for it. Private signed builds use `scripts/sign.py` (Mozilla API keys from
-Windows Credential Manager, never printed or stored in the repo).
+`src/parse.js`. Add a test for it.
 
 ## Support
 

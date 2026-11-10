@@ -76,32 +76,55 @@
     try {
       const d = p.getVideoData ? p.getVideoData() : null;
       if (!d || d.video_id !== id || !d.title) return;
-      const json = JSON.stringify({ id, title: d.title, channel: d.author || "" });
+      let handle = "";
+      try {
+        const url = p.getPlayerResponse().microformat.playerMicroformatRenderer.ownerProfileUrl || "";
+        handle = (/\/(@[^/?#]+)/.exec(url) || [])[1] || "";
+      } catch {
+        // no handle in this player version: name rules still work
+      }
+      const json = JSON.stringify({ id, title: d.title, channel: d.author || "", handle });
       if (document.documentElement.dataset.ytfVideo !== json) document.documentElement.dataset.ytfVideo = json;
     } catch {
       // player API changed: smart autoplay falls back to the sidebar tiles
     }
   }
 
+  // Steps already done for the current video. A finished step does not run again, so a speed the user
+  // changes by hand is not reset while subtitles are still loading.
+  let stepsDone = new Set();
   function apply() {
-    if (location.pathname !== "/watch") return;
+    if (location.pathname !== "/watch") {
+      // Left the video: the next visit, even to the same video, gets a new player and needs the defaults again.
+      doneFor = "";
+      theaterClickedFor = "";
+      stepsDone = new Set();
+      return;
+    }
     const id = new URLSearchParams(location.search).get("v");
     const p = document.getElementById("movie_player");
     if (id && p) publishVideo(p, id);
     if (!id || !p || id === doneFor) return;
     const s = settings();
     if (!s.enabled) return;
-    let ok = true;
-    for (const step of [() => applySpeed(p, s), () => applyQuality(p, s), () => applyTheater(s, id), () => applySubtitles(p, s)]) {
+    const steps = {
+      speed: () => applySpeed(p, s),
+      quality: () => applyQuality(p, s),
+      theater: () => applyTheater(s, id),
+      subtitles: () => applySubtitles(p, s),
+    };
+    for (const [name, step] of Object.entries(steps)) {
+      if (stepsDone.has(name)) continue;
       try {
-        ok = step() && ok;
+        if (step()) stepsDone.add(name);
       } catch {
         // The player API changes now and then; one failing default must not block the others.
       }
     }
-    if (ok || ++tries >= MAX_TRIES) {
+    if (stepsDone.size === Object.keys(steps).length || ++tries >= MAX_TRIES) {
       doneFor = id;
       tries = 0;
+      stepsDone = new Set();
     }
   }
 
@@ -111,6 +134,7 @@
   });
   document.addEventListener("ytf-settings", () => {
     doneFor = "";
+    stepsDone = new Set();
     tries = 0;
     apply();
   });
