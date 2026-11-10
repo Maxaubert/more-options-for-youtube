@@ -57,6 +57,37 @@ html[data-ytf-nocomments] :is(ytd-comments#comments, ytd-watch-flexy #comments) 
   display: none !important;
 }
 
+/* Page parts. Checked against YouTube's page on 2026-11-10 (nb-NO and en): the sidebar links use the
+   same hrefs in the full and the narrow sidebar; Shorts has only a title. */
+html[data-ytf-hidesidebar] :is(ytd-mini-guide-renderer, tp-yt-app-drawer#guide, ytd-masthead #guide-button) {
+  display: none !important;
+}
+html[data-ytf-hidesidebar] ytd-app ytd-page-manager {
+  margin-left: 0 !important; /* the space the sidebar kept free */
+}
+html[data-ytf-hidenavhome] :is(ytd-mini-guide-entry-renderer, ytd-guide-entry-renderer):has(a[href="/"]),
+html[data-ytf-hidenavshorts] :is(ytd-mini-guide-entry-renderer, ytd-guide-entry-renderer):has(a[title="Shorts"], a[href^="/shorts"]),
+html[data-ytf-hidenavsubs] :is(ytd-mini-guide-entry-renderer, ytd-guide-entry-renderer):has(a[href="/feed/subscriptions"]),
+html[data-ytf-hidenavyou] :is(ytd-mini-guide-entry-renderer, ytd-guide-entry-renderer):has(a[href="/feed/you"]) {
+  display: none !important;
+}
+html[data-ytf-hidelogo] ytd-masthead ytd-topbar-logo-renderer {
+  display: none !important;
+}
+/* The search bar keeps its space, so the buttons on the right do not move. */
+html[data-ytf-hidesearch] ytd-masthead #center {
+  visibility: hidden !important;
+}
+html[data-ytf-hidecreate] ytd-masthead #buttons > :has([aria-label="Create"], [aria-label="Opprett"], a[href*="studio.youtube.com"]),
+html[data-ytf-hidebell] ytd-masthead :is(ytd-notification-topbar-button-renderer, #buttons > :has([aria-label^="Notifications"], [aria-label^="Varsler"])),
+html[data-ytf-hideaccount] ytd-masthead #buttons > :has(#avatar-btn) {
+  display: none !important;
+}
+/* The category chips on the home page (All, Podcasts, Gaming ...) and the bar behind them. */
+html[data-ytf-hidechips] ytd-browse[page-subtype="home"] :is(ytd-feed-filter-chip-bar-renderer, #chips-wrapper, #frosted-glass) {
+  display: none !important;
+}
+
 /* "Block channel" entry added to a tile's ... menu; sized like YouTube's own entries. */
 .ytf-block-item {
   padding: 8px 16px;

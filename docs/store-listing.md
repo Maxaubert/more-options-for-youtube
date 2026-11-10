@@ -40,6 +40,7 @@ Works on the home page. Search and Subscriptions stay as YouTube shows them, and
 - Choose how many videos per row for bigger thumbnails
 - Hide titles, channel names, channel icons, or views, dates and likes, one switch each
 - No more videos playing when you hover over a thumbnail
+- Hide parts of the page: the logo, the search bar, the Create button, the bell, your channel icon, the category chips, the sidebar or single sidebar items
 
 **Your player, your defaults**
 - Autoplay that skips videos you have already watched or played, and never plays a video your filters hide
