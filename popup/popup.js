@@ -16,6 +16,15 @@
     el.style.height = el.scrollHeight + 2 + "px";
   };
 
+  // Lines in the Filter out field that look typed wrong, shown under the field as you type.
+  const warn = (el) => {
+    const box = document.getElementById("filter-warn");
+    const problems = Y.checkTitleRules(el.value);
+    box.replaceChildren(...problems.map((p) => Object.assign(document.createElement("span"), { textContent: p })));
+    box.hidden = !problems.length;
+    el.setAttribute("aria-invalid", problems.length ? "true" : "false");
+  };
+
   function read(el) {
     if (el.type === "checkbox") return el.checked;
     if (el.type === "number") {
@@ -32,6 +41,10 @@
     if (el.tagName === "TEXTAREA") {
       fit(el);
       el.addEventListener("input", () => fit(el));
+    }
+    if (el.dataset.key === "blockWords") {
+      warn(el);
+      el.addEventListener("input", () => warn(el));
     }
     el.addEventListener("change", async () => {
       await browser.storage.local.set({ [el.dataset.key]: read(el) });

@@ -184,6 +184,23 @@ test("title rules", () => {
   assert.equal(Y.decideTile(c("Top 10 games"), { ...s, enabled: false }), null);
 });
 
+test("warnings for lines typed wrong", () => {
+  const lines = (...l) => l.join("\n");
+  assert.deepEqual(Y.checkTitleRules(""), []);
+  assert.deepEqual(
+    Y.checkTitleRules(lines('@chan SHOW "a"', '@chan hide "b" "c"', "reaction", '@any "x"', "", '@chan "a"', "@chan show a",
+      '@chan show "a', '@ show "a"', '@chan show ""', '@chan show "a" b')),
+    [
+      "Line 6: add show or hide after the channel name. For now it hides.",
+      'Line 7: put the title words in quotes, like @channel show "words".',
+      "Line 8: a quote mark is missing.",
+      "Line 9: put the channel name after @.",
+      "Line 10: the quotes are empty.",
+      "Line 11: text after the last quote is ignored.",
+    ]
+  );
+});
+
 test("0.3.8 keep-only lines move into the Filter out field", () => {
   assert.equal(Y.migrateKeepOnly({ keepOnly: "", blockWords: "x" }), null);
   assert.deepEqual(Y.migrateKeepOnly({ keepOnly: "Chan: *Before you buy* | Review\nno colon", blockWords: "reaction\n" }), {

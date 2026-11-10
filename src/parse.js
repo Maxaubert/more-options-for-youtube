@@ -161,6 +161,29 @@
   const KEYWORD = /(^|\s)(show|only|hide)$/i;
   const rulesCache = new Map();
   const cleanWord = (w) => w.replace(/[*"]/g, "").trim().toLowerCase();
+
+  // Warnings for the popup about lines in the Filter out field that are probably typed wrong.
+  // Plain lines without "@" are the old title-word form and stay valid. Returns ["Line 2: ...", ...].
+  function checkTitleRules(text) {
+    const out = [];
+    (text || "").split("\n").forEach((raw, i) => {
+      const line = raw.trim();
+      if (!line.startsWith("@")) return;
+      const n = `Line ${i + 1}: `;
+      const quote = line.indexOf('"');
+      if (quote < 0) return out.push(n + 'put the title words in quotes, like @channel show "words".');
+      if ((line.match(/"/g) || []).length % 2) return out.push(n + "a quote mark is missing.");
+      const head = line.slice(1, quote).trim();
+      const name = head.replace(KEYWORD, "").trim();
+      if (!name) return out.push(n + "put the channel name after @.");
+      if (![...line.slice(quote).matchAll(/"([^"]*)"/g)].some((m) => cleanWord(m[1]))) {
+        return out.push(n + "the quotes are empty.");
+      }
+      if (line.slice(line.lastIndexOf('"') + 1).trim()) return out.push(n + "text after the last quote is ignored.");
+      if (!KEYWORD.test(head) && name.toLowerCase() !== "any") out.push(n + "add show or hide after the channel name. For now it hides.");
+    });
+    return out;
+  }
   function parseTitleRules(text) {
     if (!text) return [];
     if (!rulesCache.has(text)) {
@@ -340,7 +363,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
