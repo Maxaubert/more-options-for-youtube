@@ -8,6 +8,7 @@
     "lint": "web-ext lint --ignore-files test docs dist package.json package-lock.json scripts README.md",
     "dev": "web-ext run --ignore-files test docs dist package.json package-lock.json scripts README.md --start-url https://www.youtube.com/",
     "build:chrome": "node scripts/build-chrome.mjs",
+    "publish:chrome": "python scripts/publish-chrome.py",
     "build": "web-ext build --overwrite-dest --ignore-files test docs dist package.json package-lock.json scripts README.md",
     "sign": "python scripts/sign.py"
   },

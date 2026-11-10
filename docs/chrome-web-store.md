@@ -22,6 +22,19 @@ Written 2026-11-10. The store text itself is shared with AMO: see [store-listing
   separately.
 - Developer account: one-time $5 fee, paid by Max himself.
 
+## Updates from the command line (API)
+
+Set up 2026-11-10 with the Chrome Web Store API v2 and a service account (no browser needed after that):
+
+- Google Cloud project "more-options-for-youtube" (account aubert.mx@gmail.com), Chrome Web Store API enabled.
+- Service account `cws-publisher@more-options-for-youtube.iam.gserviceaccount.com`, added in the dashboard under
+  Settings > Tjenestekonto (only one per publisher). It needs no Cloud roles.
+- Its JSON key is in Windows Credential Manager, service `cws-yt-filter`, split into parts
+  (`python scripts/publish-chrome.py setup key.json`, then delete the file).
+- Release: bump the version, then `npm run publish:chrome` (builds, uploads, submits for review).
+  `-- --dry-run` checks sign-in and status without uploading; `-- --upload-only` stops before submitting;
+  `python scripts/publish-chrome.py status` shows the store state.
+
 ## Store listing tab
 
 | Field | Value |
