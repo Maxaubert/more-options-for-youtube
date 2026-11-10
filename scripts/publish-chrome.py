@@ -9,6 +9,11 @@ split into parts because one entry holds at most 2560 bytes. Nothing is printed 
   python scripts/publish-chrome.py --dry-run                  # build and sign in, but upload nothing
   python scripts/publish-chrome.py                            # build, upload and submit for review
   python scripts/publish-chrome.py --upload-only              # build and upload, submit by hand later
+  python scripts/publish-chrome.py --replace                  # cancel the version in review, then send this one
+  python scripts/publish-chrome.py cancel                     # cancel the version in review
+
+Google refuses uploads while a version is in review ("You may not edit or publish an item that is in
+review"). Use --replace to send a newer version anyway; the review then starts again.
 
 API reference: https://developer.chrome.com/docs/webstore/using-api (checked 2026-11-10).
 """
@@ -85,7 +90,11 @@ def main(args: list[str]) -> None:
     if args == ["status"]:
         print(json.dumps(call("GET", f"{API}:fetchStatus", credentials().token), indent=2))
         return
-    unknown = set(args) - {"--dry-run", "--upload-only"}
+    if args == ["cancel"]:
+        call("POST", f"{API}:cancelSubmission", credentials().token, json={})
+        print("Cancelled the version in review.")
+        return
+    unknown = set(args) - {"--dry-run", "--upload-only", "--replace"}
     if unknown:
         sys.exit(__doc__)
 
@@ -96,6 +105,12 @@ def main(args: list[str]) -> None:
     if "--dry-run" in args:
         print(f"Dry run: would upload {zip_path.name} ({zip_path.stat().st_size} bytes). Nothing sent.")
         return
+    in_review = (status.get("submittedItemRevisionStatus") or {}).get("state") == "PENDING_REVIEW"
+    if in_review and "--replace" not in args:
+        sys.exit("A version is in review, so Google refuses uploads. Run again with --replace to cancel it and send this one.")
+    if in_review:
+        call("POST", f"{API}:cancelSubmission", token, json={})
+        print("Cancelled the version in review.")
 
     r = requests.post(UPLOAD, headers={"Authorization": f"Bearer {token}", "Content-Type": "application/zip"},
                       data=zip_path.read_bytes(), timeout=300)

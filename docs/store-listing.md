@@ -8,7 +8,7 @@ The Chrome Web Store uses the same text as plain text, with no markdown. Chrome-
 
 - **AMO:** listed version 0.4.5 is in review. The add-on is not public yet.
   Unlisted builds (for the local install) are signed for each version.
-- **Chrome Web Store:** 0.5.2 is in review.
+- **Chrome Web Store:** 0.5.4 is in review (it replaced 0.5.2, which was cancelled).
 
 ## Name
 
