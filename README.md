@@ -95,7 +95,8 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 
 ## Privacy
 
-No data leaves your browser. No accounts, no tracking, no analytics, no network requests of its own.
+No data leaves your browser. No accounts, no tracking, no analytics. The only request it makes is to read
+your own memberships page on youtube.com (for "Show if member"), with your own YouTube session.
 Settings and the list of played videos (for smart autoplay) are stored locally by the browser.
 
 ## Limits
