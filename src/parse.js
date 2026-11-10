@@ -39,11 +39,26 @@
     shortsAsVideo: false, // open Shorts in the normal player
     noEndCards: false,
     noComments: false,
+    // Page parts (top bar and sidebar), hidden with CSS. Each key becomes data-ytf-<key in lower case> on <html>.
+    hideSidebar: false,
+    hideNavHome: false,
+    hideNavShorts: false,
+    hideNavSubs: false,
+    hideNavYou: false,
+    hideLogo: false,
+    hideSearch: false,
+    hideCreate: false,
+    hideBell: false,
+    hideAccount: false,
+    hideChips: false,
     // Block lists: one entry per line (or comma separated), matched without case
     blockChannels: "",
     blockWords: "",
     keepOnly: "", // 0.3.8 only; moved into blockWords by migrateKeepOnly
   };
+
+  const PAGE_PARTS = ["hideSidebar", "hideNavHome", "hideNavShorts", "hideNavSubs", "hideNavYou", "hideLogo",
+    "hideSearch", "hideCreate", "hideBell", "hideAccount", "hideChips"];
 
   const REASONS = {
     members: "Members only",
@@ -383,7 +398,7 @@
   }
 
   const YTF = {
-    DEFAULTS, REASONS, UNIT_DAYS,
+    DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,

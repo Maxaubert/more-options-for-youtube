@@ -174,6 +174,7 @@
       "data-ytf-noendcards": on && settings.noEndCards,
       "data-ytf-nocomments": on && settings.noComments,
     };
+    for (const key of Y.PAGE_PARTS) flags["data-ytf-" + key.toLowerCase()] = on && settings[key];
     for (const [name, value] of Object.entries(flags)) {
       if (value && !ROOT.hasAttribute(name)) ROOT.setAttribute(name, "");
       if (!value && ROOT.hasAttribute(name)) ROOT.removeAttribute(name);

@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.5.7](https://img.shields.io/badge/version-0.5.7-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
   [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
@@ -44,6 +44,9 @@ sent anywhere.
 - Choose how many videos per row; tiles grow past YouTube's usual 700 px cap.
 - Hide titles, channel names, channel icons, or views, dates and likes, one switch each.
 - No previews on hover: thumbnails stay still.
+- Hide parts of the page, one switch each: the YouTube logo, the search bar, the Create button, the
+  notification bell, your channel icon, the category chips, the whole sidebar, or single sidebar items
+  (Home, Shorts, Subscriptions, You).
 
 **Your player, your defaults**
 - Autoplay that skips videos you have already watched or played, so it stops looping.
@@ -77,7 +80,7 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 
 ## Usage
 
-- **Settings:** click the toolbar icon. Settings sit in four tabs: Hide, Grid, Player and Block. Every change applies immediately, no reload.
+- **Settings:** click the toolbar icon. Settings sit in four tabs: Hide, Layout, Player and Block. Every change applies immediately, no reload.
 - **Hidden count:** on a page the filters cover, the bottom of the popup shows how many videos were hidden
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the

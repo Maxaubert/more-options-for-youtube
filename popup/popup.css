@@ -69,6 +69,8 @@ h1 { margin: 0; flex: 1; font-size: 22px; font-weight: 750; letter-spacing: -0.0
 
 section { margin: 0 4px 12px 12px; padding: 6px 14px; background: var(--panel); border-radius: 14px; }
 
+.sec-title { margin: 8px 0 2px; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); }
+
 /* Rows */
 .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; }
 .row > span:first-child { flex: 1; }
