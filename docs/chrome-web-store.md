@@ -17,10 +17,14 @@ Answers for the Chrome Web Store dashboard, and how updates are sent. The store 
    this store. Chrome and AMO count versions separately.
 2. Run `npm run publish:chrome`. It builds `dist/chrome`, uploads the zip and sends it for review.
 
+If a version is still in review, Google refuses the upload. `npm run publish:chrome -- --replace` cancels
+that review and sends the new version; the review starts again.
+
 Other commands:
 - `npm run publish:chrome -- --dry-run`: build and sign in, but upload nothing.
 - `npm run publish:chrome -- --upload-only`: upload, but do not send for review.
 - `python scripts/publish-chrome.py status`: show what the store has now.
+- `python scripts/publish-chrome.py cancel`: cancel the version in review.
 
 How sign-in works: Google Cloud project `more-options-for-youtube` has the Chrome Web Store API on.
 The service account `cws-publisher@more-options-for-youtube.iam.gserviceaccount.com` is added in the
