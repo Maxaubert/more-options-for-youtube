@@ -263,6 +263,15 @@ test("smart autoplay picks the first new video", () => {
   assert.equal(Y.pickNext(c, "a", new Set(["b", "c", "d"]), new Set()), null);
 });
 
+test("autoplay is told apart from the user moving on", () => {
+  const end = { fromWatch: true, ended: false, duration: 600, currentTime: 590, msSinceUser: 60000 };
+  assert.equal(Y.wasAutoplay(end), true); // last 30 s, nobody touched anything
+  assert.equal(Y.wasAutoplay({ ...end, currentTime: 300 }), false); // Back button in the middle
+  assert.equal(Y.wasAutoplay({ ...end, msSinceUser: 500 }), false); // the user clicked the next video
+  assert.equal(Y.wasAutoplay({ ...end, ended: true, currentTime: 0, duration: NaN }), true);
+  assert.equal(Y.wasAutoplay({ ...end, fromWatch: false }), false); // from home or search: not autoplay
+});
+
 test("smart autoplay skips played, watched and filtered videos it lands on", () => {
   const s = { ...S, blockWords: '@gameranx show "before you buy"' };
   const base = { played: new Set(["p"]), watched: new Set(["w"]), settings: s };
