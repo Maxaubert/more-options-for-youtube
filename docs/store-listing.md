@@ -4,11 +4,14 @@ One source for the text on both stores. Firefox (AMO) uses this file as is.
 The Chrome Web Store uses the same text as plain text, with no markdown. Chrome-only answers are in
 [chrome-web-store.md](chrome-web-store.md).
 
-## Status (2026-11-10)
+## Status
 
-- **AMO:** listed version 0.4.5 is in review. The add-on is not public yet.
-  Unlisted builds (for the local install) are signed for each version.
-- **Chrome Web Store:** 0.5.4 is in review (it replaced 0.5.2, which was cancelled).
+Every merge with a version bump goes to both stores (see the Release section in [CLAUDE.md](../CLAUDE.md)),
+so each store has the newest version in review or live. To check:
+- AMO: Developer Hub > More Options for YouTube > Manage Status & Versions.
+- Chrome: `python scripts/publish-chrome.py status`.
+
+Neither store had the add-on public on 2026-11-10; both were reviewing 0.5.5.
 
 ## Name
 
