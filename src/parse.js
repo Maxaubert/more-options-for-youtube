@@ -43,11 +43,14 @@
     // Block lists: one entry per line (or comma separated), matched without case
     blockChannels: "",
     blockWords: "",
+    // Channel title filters: "Gameranx: before you buy | review" keeps only those videos from that channel
+    keepOnly: "",
   };
 
   const REASONS = {
     members: "Members only",
     blocked: "Blocked",
+    keepOnly: "Channel filter",
     shorts: "Shorts",
     playables: "Playables",
     news: "News rows",
@@ -143,14 +146,52 @@
     return listCache.get(text);
   }
 
+  // Whether a tile's channel is the listed name c (lower case): the exact name or its @handle.
+  function channelIs(info, c) {
+    const channel = (info.channel || "").trim().toLowerCase();
+    if (channel && (c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
+    return !!info.handle && info.handle.toLowerCase() === c;
+  }
+
   // Channel must match a listed name exactly (or its @handle); a word matches anywhere in the title.
   function isBlocked(info, s) {
-    const channels = parseList(s.blockChannels);
-    const channel = (info.channel || "").trim().toLowerCase();
-    if (channel && channels.some((c) => c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
-    if (info.handle && channels.includes(info.handle.toLowerCase())) return true;
+    if (parseList(s.blockChannels).some((c) => channelIs(info, c))) return true;
     const title = (info.title || "").toLowerCase();
     return !!title && parseList(s.blockWords).some((w) => title.includes(w));
+  }
+
+  // "Gameranx: *Before you buy* | review" -> [{channel: "gameranx", words: ["before you buy", "review"]}].
+  // The channel is the text before the first colon; words are split on "|"; "*" and quotes are ignored,
+  // so "*Before you buy*" works too. Lines without a colon or without words are skipped.
+  const filterCache = new Map();
+  function parseKeepOnly(text) {
+    if (!text) return [];
+    if (!filterCache.has(text)) {
+      if (filterCache.size > 20) filterCache.clear();
+      const rules = [];
+      for (const line of text.split("\n")) {
+        const at = line.indexOf(":");
+        if (at < 0) continue;
+        const channel = line.slice(0, at).trim().toLowerCase();
+        const words = line
+          .slice(at + 1)
+          .split("|")
+          .map((w) => w.replace(/[*"]/g, "").trim().toLowerCase())
+          .filter(Boolean);
+        if (channel && words.length) rules.push({ channel, words });
+      }
+      filterCache.set(text, rules);
+    }
+    return filterCache.get(text);
+  }
+
+  // A video from a filtered channel stays only if its title holds one of that channel's words.
+  // A tile with no title read yet is left alone rather than hidden by mistake.
+  function failsKeepOnly(info, s) {
+    const title = (info.title || "").toLowerCase();
+    if (!title) return false;
+    const rules = parseKeepOnly(s.keepOnly).filter((r) => channelIs(info, r.channel));
+    return rules.length > 0 && !rules.some((r) => r.words.some((w) => title.includes(w)));
   }
 
   // Members-only videos: hidden unless the mode is "never", or "unlessMember" and the user pays for that channel.
@@ -190,6 +231,7 @@
     if (hideMembers(info, s)) return "members";
     if (!s.enabled) return null;
     if (isBlocked(info, s)) return "blocked";
+    if (failsKeepOnly(info, s)) return "keepOnly";
     if (info.kind === "shorts" && s.shorts) return "shorts";
     if (info.kind === "playable" && s.playables) return "playables";
     if (info.kind === "mix" && s.mixes) return "mixes";
@@ -257,7 +299,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, hideMembers, inChannelList, parseChannelList,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseKeepOnly, failsKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

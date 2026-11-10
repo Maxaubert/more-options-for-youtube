@@ -147,6 +147,22 @@ test("block lists", () => {
   assert.equal(Y.decideTile(video({ channel: "MrBeast" }), { ...s, enabled: false }), null);
 });
 
+test("channel title filters", () => {
+  assert.deepEqual(Y.parseKeepOnly("Gameranx: *Before you buy* | Review\nno colon\nEmpty:  \n@Handle: a: b"), [
+    { channel: "gameranx", words: ["before you buy", "review"] },
+    { channel: "@handle", words: ["a: b"] },
+  ]);
+  const s = { ...S, keepOnly: "Gameranx: *Before you buy*\n@otherhandle: tutorial" };
+  const g = (title) => video({ channel: "GameRanx", title });
+  assert.equal(Y.decideTile(g("Elden Ring - Before You Buy"), s), null);
+  assert.equal(Y.decideTile(g("Top 10 Games of 2026"), s), "keepOnly");
+  assert.equal(Y.decideTile(g(""), s), null);
+  assert.equal(Y.decideTile(video({ channel: "Someone else", title: "Top 10 Games" }), s), null);
+  assert.equal(Y.decideTile(video({ channel: "X", handle: "@OtherHandle", title: "Vlog" }), s), "keepOnly");
+  assert.equal(Y.decideTile(video({ channel: "X", handle: "@OtherHandle", title: "Rust tutorial" }), s), null);
+  assert.equal(Y.decideTile(g("Top 10 Games of 2026"), { ...s, enabled: false }), null);
+});
+
 test("video ids", () => {
   assert.equal(Y.videoIdFromHref("/watch?v=KfODG5REyss"), "KfODG5REyss");
   assert.equal(Y.videoIdFromHref("/watch?v=NiCgcUTL9_Q&pp=0gcJ"), "NiCgcUTL9_Q");
