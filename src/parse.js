@@ -43,14 +43,13 @@
     // Block lists: one entry per line (or comma separated), matched without case
     blockChannels: "",
     blockWords: "",
-    // Channel title filters: "Gameranx: before you buy | review" keeps only those videos from that channel
-    keepOnly: "",
+    keepOnly: "", // 0.3.8 only; moved into blockWords by migrateKeepOnly
   };
 
   const REASONS = {
     members: "Members only",
     blocked: "Blocked",
-    keepOnly: "Channel filter",
+    keepOnly: "Only-titles rule",
     shorts: "Shorts",
     playables: "Playables",
     news: "News rows",
@@ -153,45 +152,83 @@
     return !!info.handle && info.handle.toLowerCase() === c;
   }
 
-  // Channel must match a listed name exactly (or its @handle); a word matches anywhere in the title.
+  // Title rules, one per line (the "Titles" field):
+  //   shorts                      block titles with "shorts" from any channel (old plain form, commas split)
+  //   @any "shorts"               the same
+  //   @channel "top 10" "ranked"  block those titles from one channel (name or @handle)
+  //   @channel only "review"      keep only those titles from that channel, hide the rest
+  // -> [{channel: "@channel" | null, only, words}]. "*" is ignored, so "*before you buy*" works too.
+  const rulesCache = new Map();
+  const cleanWord = (w) => w.replace(/[*"]/g, "").trim().toLowerCase();
+  function parseTitleRules(text) {
+    if (!text) return [];
+    if (!rulesCache.has(text)) {
+      if (rulesCache.size > 20) rulesCache.clear();
+      const rules = [];
+      for (const raw of text.split("\n")) {
+        const line = raw.trim();
+        if (!line.startsWith("@")) {
+          const words = line.split(",").map(cleanWord).filter(Boolean);
+          if (words.length) rules.push({ channel: null, only: false, words });
+          continue;
+        }
+        const quote = line.indexOf('"');
+        let head, words;
+        if (quote >= 0) {
+          head = line.slice(1, quote).trim();
+          words = [...line.slice(quote).matchAll(/"([^"]*)"?/g)].map((m) => cleanWord(m[1])).filter(Boolean);
+        } else {
+          // No quotes: "@channel word" (a channel name with spaces needs the quotes)
+          const [first, ...rest] = line.slice(1).split(/\s+/);
+          head = first;
+          words = [cleanWord(rest.join(" "))].filter(Boolean);
+        }
+        const only = /(^|\s)only$/i.test(head);
+        if (only) head = head.replace(/(^|\s)only$/i, "").trim();
+        const name = head.toLowerCase();
+        if (!words.length || (!name && !only)) continue;
+        rules.push({ channel: !name || name === "any" ? null : "@" + name, only, words });
+      }
+      rulesCache.set(text, rules);
+    }
+    return rulesCache.get(text);
+  }
+
+  const ruleFits = (info, r) => !r.channel || channelIs(info, r.channel);
+  const titleHas = (title, r) => r.words.some((w) => title.includes(w));
+
+  // Channel must match a listed name exactly (or its @handle); a block rule's word matches anywhere in the title.
   function isBlocked(info, s) {
     if (parseList(s.blockChannels).some((c) => channelIs(info, c))) return true;
     const title = (info.title || "").toLowerCase();
-    return !!title && parseList(s.blockWords).some((w) => title.includes(w));
+    return !!title && parseTitleRules(s.blockWords).some((r) => !r.only && ruleFits(info, r) && titleHas(title, r));
   }
 
-  // "Gameranx: *Before you buy* | review" -> [{channel: "gameranx", words: ["before you buy", "review"]}].
-  // The channel is the text before the first colon; words are split on "|"; "*" and quotes are ignored,
-  // so "*Before you buy*" works too. Lines without a colon or without words are skipped.
-  const filterCache = new Map();
-  function parseKeepOnly(text) {
-    if (!text) return [];
-    if (!filterCache.has(text)) {
-      if (filterCache.size > 20) filterCache.clear();
-      const rules = [];
-      for (const line of text.split("\n")) {
-        const at = line.indexOf(":");
-        if (at < 0) continue;
-        const channel = line.slice(0, at).trim().toLowerCase();
-        const words = line
-          .slice(at + 1)
-          .split("|")
-          .map((w) => w.replace(/[*"]/g, "").trim().toLowerCase())
-          .filter(Boolean);
-        if (channel && words.length) rules.push({ channel, words });
-      }
-      filterCache.set(text, rules);
-    }
-    return filterCache.get(text);
-  }
-
-  // A video from a filtered channel stays only if its title holds one of that channel's words.
+  // With "only" rules for a channel, its videos stay only if the title holds one of their words.
   // A tile with no title read yet is left alone rather than hidden by mistake.
   function failsKeepOnly(info, s) {
     const title = (info.title || "").toLowerCase();
     if (!title) return false;
-    const rules = parseKeepOnly(s.keepOnly).filter((r) => channelIs(info, r.channel));
-    return rules.length > 0 && !rules.some((r) => r.words.some((w) => title.includes(w)));
+    const rules = parseTitleRules(s.blockWords).filter((r) => r.only && ruleFits(info, r));
+    return rules.length > 0 && !rules.some((r) => titleHas(title, r));
+  }
+
+  // 0.3.8 had a separate "keepOnly" field ("Gameranx: before you buy | review"). Returns the storage
+  // change that moves its lines into the Titles field as "@Gameranx only ..." rules, or null.
+  function migrateKeepOnly(s) {
+    if (!s.keepOnly) return null;
+    const moved = s.keepOnly
+      .split("\n")
+      .map((line) => {
+        const at = line.indexOf(":");
+        if (at < 0) return "";
+        const words = line.slice(at + 1).split("|").map(cleanWord).filter(Boolean);
+        const name = line.slice(0, at).trim().replace(/^@/, "");
+        return name && words.length ? `@${name} only ${words.map((w) => `"${w}"`).join(" ")}` : "";
+      })
+      .filter(Boolean);
+    const words = (s.blockWords || "").trim();
+    return { keepOnly: "", blockWords: [words, ...moved].filter(Boolean).join("\n") };
   }
 
   // Members-only videos: hidden unless the mode is "never", or "unlessMember" and the user pays for that channel.
@@ -299,7 +336,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseKeepOnly, failsKeepOnly, hideMembers, inChannelList, parseChannelList,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

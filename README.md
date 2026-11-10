@@ -34,8 +34,8 @@ sent anywhere.
   percentage you pick.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
   **Block channel**.
-- Channel title filters: keep only some videos from a channel, for example only the "Before you buy"
-  videos from Gameranx.
+- Title rules per channel: block some titles from one channel, or keep only one series from a channel
+  and hide the rest.
 - On the home page, and with one switch also on Search, Subscriptions and the list next to a video.
 
 **A tidier grid**
@@ -69,10 +69,12 @@ Needs Firefox or Zen 142 or newer.
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
   Block section (one per line). Remove a line to unblock.
-- **Keep only some videos from a channel:** in the Block section, write `channel: words` on one line, for
-  example `Gameranx: before you buy`. Videos from that channel show only if the title holds those words.
-  Put `|` between several choices (`Gameranx: before you buy | review`). The channel is the name or
-  @handle, as for blocking. Case does not matter, and `*` is ignored.
+- **Title rules:** the Titles field in the Block section takes one rule per line. Case does not matter.
+  - `@channel "shorts"` hides videos from that channel with "shorts" in the title.
+  - `@any "shorts"` (or just `shorts`) hides them from every channel.
+  - `@channel only "review"` keeps only the videos from that channel with "review" in the title.
+  - Put several words in quotes on one line to match any of them: `@channel "top 10" "ranked"`.
+  - The channel is its name or @handle. A name with spaces works too: `@Some Channel "live"`.
 - **Turn it all off:** the switch at the top of the popup pauses everything, so YouTube looks exactly as
   normal.
 - **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
