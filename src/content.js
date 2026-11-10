@@ -399,10 +399,11 @@
   browser.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && Object.keys(changes).some((k) => k in Y.DEFAULTS)) loadSettings();
   });
-  browser.runtime.onMessage.addListener((msg) => {
+  // sendResponse instead of a returned promise: Chrome does not accept a promise as the reply.
+  browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg && msg.type === "ytf-stats") {
       run();
-      return Promise.resolve({ active: !!pageRoot(), counts });
+      sendResponse({ active: !!pageRoot(), counts });
     }
   });
 

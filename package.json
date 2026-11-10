@@ -1,13 +1,14 @@
 {
   "name": "more-options-for-youtube",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Zen/Firefox extension that filters the YouTube home page",
   "scripts": {
     "test": "node --test",
-    "lint": "web-ext lint --ignore-files test docs package.json package-lock.json scripts README.md",
-    "dev": "web-ext run --ignore-files test docs package.json package-lock.json scripts README.md --start-url https://www.youtube.com/",
-    "build": "web-ext build --overwrite-dest --ignore-files test docs package.json package-lock.json scripts README.md",
+    "lint": "web-ext lint --ignore-files test docs dist package.json package-lock.json scripts README.md",
+    "dev": "web-ext run --ignore-files test docs dist package.json package-lock.json scripts README.md --start-url https://www.youtube.com/",
+    "build:chrome": "node scripts/build-chrome.mjs",
+    "build": "web-ext build --overwrite-dest --ignore-files test docs dist package.json package-lock.json scripts README.md",
     "sign": "python scripts/sign.py"
   },
   "devDependencies": {
