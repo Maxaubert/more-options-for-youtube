@@ -3,10 +3,12 @@
 
   # More Options for YouTube
 
-  A calmer YouTube for Firefox and Zen: hide what you never want to see, and make the player start your way.
+  A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.3.7](https://img.shields.io/badge/version-0.3.7-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.5.2](https://img.shields.io/badge/version-0.5.2-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
+  [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
+  [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
   [![Manifest V3](https://img.shields.io/badge/Manifest-V3-ff0000?style=flat-square)](manifest.json)
   [![No data collected](https://img.shields.io/badge/data%20collected-none-ff0000?style=flat-square)](#privacy)
   [![Licence: MIT](https://img.shields.io/badge/licence-MIT-ff0000?style=flat-square)](LICENSE)
@@ -61,6 +63,15 @@ Reads YouTube in English and Norwegian. The popup uses large, high-contrast type
 
 Needs Firefox or Zen 142 or newer.
 
+**Chrome, Edge, Brave** (from source):
+1. `npm install`, then `npm run build:chrome`. This makes `dist/chrome` and a zip for the Chrome Web Store
+   in `web-ext-artifacts/`.
+2. Open `chrome://extensions`, turn on Developer mode, choose **Load unpacked** and pick `dist/chrome`.
+
+Needs Chrome 111 or newer (for the script that talks to the player).
+
+**Safari:** needs a Mac with Xcode. See [docs/safari.md](docs/safari.md).
+
 ## Usage
 
 - **Settings:** click the toolbar icon. Settings sit in four tabs: Hide, Grid, Player and Block. Every change applies immediately, no reload.
@@ -91,11 +102,13 @@ Settings and the list of played videos (for smart autoplay) are stored locally b
 
 - YouTube changes its page often; a filter can stop working until a selector is updated.
 - Default quality and subtitles use YouTube's player API, which YouTube can change without notice.
-- Firefox and Zen only for now; no Chrome version.
+- Firefox and Zen are tested daily. Chrome and Safari run the same code but are tested less; Safari needs
+  Xcode on a Mac, and is not in the App Store.
 
 ## Development
 
-Plain JavaScript, no build step. `src/parse.js` holds the pure text reading (ages, view counts, badges,
+Plain JavaScript, no build step for Firefox (`npm run build:chrome` only copies files and trims the
+manifest for Chrome and Safari). `src/compat.js` lets Chrome use the same `browser` API; `src/parse.js` holds the pure text reading (ages, view counts, badges,
 rules) and is covered by tests; `src/content.js` finds tiles on the page and hides them; `src/main.js`
 runs inside the page to talk to the YouTube player; `popup/` is the settings window.
 

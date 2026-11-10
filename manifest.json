@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "More Options for YouTube",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, and set your player defaults.",
   "browser_specific_settings": {
     "gecko": {
@@ -10,13 +10,13 @@
       "data_collection_permissions": { "required": ["none"] }
     }
   },
-  "icons": { "48": "icons/icon.svg", "96": "icons/icon.svg" },
+  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
   "permissions": ["storage"],
   "host_permissions": ["*://www.youtube.com/*"],
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/*"],
-      "js": ["src/parse.js", "src/content.js"],
+      "js": ["src/compat.js", "src/parse.js", "src/content.js"],
       "css": ["src/content.css"],
       "run_at": "document_idle"
     },
@@ -30,6 +30,6 @@
   "action": {
     "default_title": "More Options for YouTube",
     "default_popup": "popup/popup.html",
-    "default_icon": "icons/icon.svg"
+    "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png" }
   }
 }
