@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.5.3](https://img.shields.io/badge/version-0.5.3-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.5.4](https://img.shields.io/badge/version-0.5.4-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
   [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
@@ -37,7 +37,7 @@ sent anywhere.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
   **Block channel**.
 - Filter a channel by title: show only one series from a channel, or hide some of its titles.
-- On the home page, and with one switch also on Search, Subscriptions and the list next to a video.
+- On the home page. One switch adds Search, Subscriptions and the list next to a video (off by default).
 
 **A tidier grid**
 - Choose how many videos per row; tiles grow past YouTube's usual 700 px cap.
@@ -93,8 +93,8 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 - **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
   once a day to know which channels you pay for. The list stays in your browser. When you are logged out,
   it does not save an answer.
-- **Defaults:** Shorts and news rows are hidden, autoplay skips repeats, and members-only videos show only
-  for your memberships. Everything else starts off.
+- **Defaults:** filters work on the home page only. Shorts and news rows are hidden, autoplay skips repeats,
+  and members-only videos show only for your memberships. Everything else starts off.
 
 ## Privacy
 
