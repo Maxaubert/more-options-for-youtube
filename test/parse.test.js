@@ -201,6 +201,22 @@ test("warnings for lines typed wrong", () => {
   );
 });
 
+test("a show or hide rule without a channel name is ignored, not applied to every channel", () => {
+  assert.deepEqual(Y.parseTitleRules('@show "x"'), []);
+  assert.deepEqual(Y.parseTitleRules('@ show "x"'), []);
+  assert.deepEqual(Y.parseTitleRules('@only "x"'), []);
+  assert.equal(Y.decideTile(video({ channel: "Anyone", title: "Vlog" }), { ...S, blockWords: '@show "x"' }), null);
+  assert.equal(Y.parseTitleRules('@any only "x"')[0].channel, null); // the explicit form still works
+});
+
+test("smart autoplay matches @handle rules from the player", () => {
+  const base = { played: new Set(), watched: new Set() };
+  const video = { title: "Vlog", channel: "Some Name", handle: "@somehandle" };
+  assert.equal(Y.autoplaySkip("x", { ...base, video, settings: { ...S, blockChannels: "@somehandle" } }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video, settings: { ...S, blockWords: '@somehandle show "review"' } }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video: { ...video, title: "Game review" }, settings: { ...S, blockWords: '@somehandle show "review"' } }), null);
+});
+
 test("0.3.8 keep-only lines move into the Filter out field", () => {
   assert.equal(Y.migrateKeepOnly({ keepOnly: "", blockWords: "x" }), null);
   assert.deepEqual(Y.migrateKeepOnly({ keepOnly: "Chan: *Before you buy* | Review\nno colon", blockWords: "reaction\n" }), {

@@ -142,7 +142,12 @@
       for (const v of document.querySelectorAll("ytd-video-preview video, #video-preview video")) if (!v.paused) v.pause();
     }
     const root = pageRoot();
-    if (!root) return;
+    if (!root) {
+      // A page the filters do not cover (or "everywhere" was just turned off): undo old marks, because YouTube
+      // reuses these elements for other videos.
+      for (const el of document.querySelectorAll(`[${ATTR}]`)) el.removeAttribute(ATTR);
+      return;
+    }
     for (const shelf of outermost(root, SHELF)) mark(shelf, Y.decideShelf(shelfInfo(shelf), settings));
     // YouTube recycles tile elements with new videos, so every tile is checked on every pass.
     for (const tile of outermost(root, TILE)) {
@@ -248,7 +253,12 @@
     if (set.has(id)) return;
     set.add(id);
     clearTimeout(saveTimers[key]);
-    saveTimers[key] = setTimeout(() => browser.storage.local.set({ [key]: [...set].slice(-2000) }), 1000);
+    // Merge with what other tabs saved meanwhile, so the last tab to save does not erase their videos.
+    saveTimers[key] = setTimeout(async () => {
+      const saved = (await browser.storage.local.get({ [key]: [] }))[key];
+      saved.forEach((v) => set.add(v));
+      await browser.storage.local.set({ [key]: [...set].slice(-2000) });
+    }, 1000);
   }
 
   function onWatchPage() {
@@ -382,10 +392,15 @@
       if (ytfMemberships && Date.now() - ytfMemberships.at < MEMBERSHIPS_MAX_AGE) {
         memberships = { names: new Set(ytfMemberships.names), handles: new Set(ytfMemberships.handles) };
       } else {
-        const html = await (await fetch("/paid_memberships", { credentials: "include" })).text();
-        memberships = Y.parseChannelList(html);
+        const res = await fetch("/paid_memberships", { credentials: "include" });
+        // Logged out, a consent page or an error: do not trust or keep the answer.
+        if (!res.ok || !new URL(res.url).pathname.startsWith("/paid_memberships")) return;
+        memberships = Y.parseChannelList(await res.text());
+        const empty = !memberships.names.size && !memberships.handles.size;
+        // An empty list may be a page YouTube changed; ask again after 15 minutes, not after a day.
+        const at = empty ? Date.now() - MEMBERSHIPS_MAX_AGE + 15 * 60 * 1000 : Date.now();
         await browser.storage.local.set({
-          ytfMemberships: { at: Date.now(), names: [...memberships.names], handles: [...memberships.handles] },
+          ytfMemberships: { at, names: [...memberships.names], handles: [...memberships.handles] },
         });
       }
       schedule();
@@ -397,7 +412,11 @@
   }
 
   browser.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && Object.keys(changes).some((k) => k in Y.DEFAULTS)) loadSettings();
+    if (area !== "local") return;
+    if (Object.keys(changes).some((k) => k in Y.DEFAULTS)) loadSettings();
+    // Videos played or watched in other tabs count here too.
+    if (changes.ytfPlayed) (changes.ytfPlayed.newValue || []).forEach((v) => played.add(v));
+    if (changes.ytfWatched) (changes.ytfWatched.newValue || []).forEach((v) => watched.add(v));
   });
   // sendResponse instead of a returned promise: Chrome does not accept a promise as the reply.
   browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {

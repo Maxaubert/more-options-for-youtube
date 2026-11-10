@@ -1,8 +1,8 @@
 {
   "name": "more-options-for-youtube",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
-  "description": "Zen/Firefox extension that filters the YouTube home page",
+  "description": "Browser extension (Firefox, Zen, Chrome, Safari) that filters YouTube and sets player defaults",
   "scripts": {
     "test": "node --test",
     "lint": "web-ext lint --ignore-files test docs dist package.json package-lock.json scripts README.md",
