@@ -1,6 +1,6 @@
 {
   "name": "more-options-for-youtube",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": true,
   "description": "Zen/Firefox extension that filters the YouTube home page",
   "scripts": {
