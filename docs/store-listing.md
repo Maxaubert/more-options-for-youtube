@@ -44,6 +44,8 @@ Reads YouTube in English and Norwegian.
 **Privacy:** no data leaves your browser. No accounts, no tracking, no analytics. Settings are stored
 locally by your browser.
 
+Like it? You can support it at https://ko-fi.com/maxaubert
+
 **Open source:** the code is on GitHub at https://github.com/Maxaubert/more-options-for-youtube (MIT licence). Bug
 reports and ideas are welcome there.
 
