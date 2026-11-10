@@ -247,6 +247,20 @@ test("smart autoplay picks the first new video", () => {
   assert.equal(Y.pickNext(c, "a", new Set(["b", "c", "d"]), new Set()), null);
 });
 
+test("smart autoplay skips played, watched and filtered videos it lands on", () => {
+  const s = { ...S, blockWords: '@gameranx show "before you buy"' };
+  const base = { played: new Set(["p"]), watched: new Set(["w"]), settings: s };
+  assert.equal(Y.autoplaySkip("p", base), "played");
+  assert.equal(Y.autoplaySkip("w", base), "watched");
+  assert.equal(Y.autoplaySkip("x", { ...base, tile: { reason: null, watchedPct: 12 } }), "watched");
+  assert.equal(Y.autoplaySkip("x", { ...base, tile: { reason: "keepOnly", watchedPct: null } }), "hidden");
+  const video = (title) => ({ title, channel: "gameranx" });
+  assert.equal(Y.autoplaySkip("x", { ...base, video: video("10 DUMB yet Hilarious Easter Eggs in Video Games") }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video: video("Some Game - Before You Buy") }), null);
+  assert.equal(Y.autoplaySkip("x", { ...base, tile: { reason: null, watchedPct: null } }), null);
+  assert.equal(Y.autoplaySkip("x", { ...base, settings: { ...s, enabled: false }, video: video("Top 10") }), null);
+});
+
 test("shelves", () => {
   assert.equal(Y.decideShelf({ shorts: true, playables: false, title: "Shorts" }, S), "shorts");
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "YouTube Playables" }, S), null);

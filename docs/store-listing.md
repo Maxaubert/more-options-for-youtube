@@ -71,7 +71,7 @@ reports and ideas are welcome there.
 ## How to submit (Max does this)
 
 The add-on already exists on AMO as unlisted (same ID, `yt-filter@loftspace`), so the public listing is a new
-version of it. Every upload needs a version number AMO has not seen; the unlisted ones used 0.1.0 to 0.3.1, 0.3.4 to 0.3.6, 0.3.8, 0.4.0, 0.4.2 and 0.4.4.
+version of it. Every upload needs a version number AMO has not seen; the unlisted ones used 0.1.0 to 0.3.1, 0.3.4 to 0.3.6, 0.3.8, 0.4.0, 0.4.2, 0.4.4 and 0.5.0.
 
 Pattern (2026-11-10): sign version N unlisted for the local install (`npm run sign`), then bump to N+1 and
 upload that to the listed channel:

@@ -151,7 +151,9 @@
       const info = tileInfo(tile);
       info.member = Y.inChannelList(info, memberships);
       if (info.id && info.watchedPct != null && info.watchedPct >= settings.watchedPct) remember(watched, "ytfWatched", info.id);
-      mark(tile, Y.decideTile(info, settings));
+      const reason = Y.decideTile(info, settings);
+      noteTile(info, reason);
+      mark(tile, reason);
     }
   }
 
@@ -182,15 +184,64 @@
   }
 
   // --- Smart autoplay -------------------------------------------------------------------------
-  // When a video ends and YouTube autoplays one that was already played or watched, jump to the
-  // first video in the sidebar that is neither. A click or key press after the end means you chose
-  // the next video yourself, so it is left alone.
+  // When a video ends, we pick the next one ourselves before YouTube does: the first sidebar video
+  // that no filter hides, that has no watched bar and that was not played on this computer.
+  // If YouTube still autoplays something else, we check it on arrival and skip it when it was
+  // played, watched or filtered. A click or key press after the end means you chose the next
+  // video yourself, so it is left alone.
   let endedAt = 0;
   let userAt = 0;
+  let ourPick = "";
   document.addEventListener("ended", (e) => {
-    if (e.target.closest && e.target.closest("#movie_player")) endedAt = Date.now();
+    const player = e.target.closest && e.target.closest("#movie_player");
+    if (!player || player.classList.contains("ad-showing")) return;
+    endedAt = Date.now();
+    pickBeforeYouTube(player);
   }, true);
   for (const type of ["pointerdown", "keydown"]) document.addEventListener(type, () => (userAt = Date.now()), true);
+
+  // What we last saw of each video as a tile: why it was hidden, and its watched bar.
+  const tileState = new Map();
+  function noteTile(info, reason) {
+    if (!info.id) return;
+    tileState.delete(info.id);
+    tileState.set(info.id, { reason, watchedPct: info.watchedPct });
+    if (tileState.size > 1000) tileState.delete(tileState.keys().next().value);
+  }
+
+  // Sidebar videos smart autoplay may jump to. Filters are checked here too, so this also works when
+  // the filters are not shown on the watch page.
+  function candidates() {
+    const side = document.querySelector("ytd-watch-flexy #secondary");
+    if (!side) return [];
+    return outermost(side, TILE)
+      .map((t) => {
+        const info = tileInfo(t);
+        info.member = Y.inChannelList(info, memberships);
+        const reason = Y.decideTile(info, settings);
+        noteTile(info, reason);
+        return reason ? null : info;
+      })
+      .filter((c) => c && c.kind === "video" && !c.members && !c.live && !c.upcoming && c.watchedPct == null);
+  }
+
+  // YouTube's own autoplay switch under the video; when it is off, nothing should play next.
+  const autonavOn = () => {
+    const toggle = document.querySelector(".ytp-autonav-toggle-button");
+    return !toggle || toggle.getAttribute("aria-checked") === "true";
+  };
+
+  function pickBeforeYouTube(player) {
+    const id = currentId();
+    if (!settings.enabled || !settings.smartAutoplay || !id || !autonavOn()) return;
+    if (new URLSearchParams(location.search).has("list")) return; // playlists play in their own order
+    const video = player.querySelector("video");
+    if (video && video.duration && video.currentTime < video.duration - 1) return;
+    const next = Y.pickNext(candidates(), id, played, watched);
+    if (!next) return;
+    ourPick = next.id;
+    next.link.click();
+  }
 
   const saveTimers = {};
   function remember(set, key, id) {
@@ -205,28 +256,42 @@
     if (!id) return;
     const autoplayed = endedAt && Date.now() - endedAt < 20000 && userAt < endedAt;
     endedAt = 0;
-    const repeat = played.has(id) || watched.has(id);
+    const picked = ourPick === id;
+    ourPick = "";
+    const known = { played: new Set(played), watched, tile: tileState.get(id), settings };
     remember(played, "ytfPlayed", id);
-    if (settings.enabled && settings.smartAutoplay && autoplayed && repeat) skipRepeat(id);
+    if (!settings.enabled || !settings.smartAutoplay || !autoplayed || picked) return;
+    const why = Y.autoplaySkip(id, known);
+    if (why) return skipRepeat(id, why !== "hidden");
+    // Not known from a tile: wait for the player's title and channel (main.js), then check the filters.
+    let tries = 0;
+    const timer = setInterval(() => {
+      let video = null;
+      try {
+        video = JSON.parse(ROOT.dataset.ytfVideo || "null");
+      } catch {
+        // ignore
+      }
+      const ready = video && video.id === id;
+      if (ready || ++tries > 20 || currentId() !== id) clearInterval(timer);
+      const late = ready && currentId() === id && Y.autoplaySkip(id, { ...known, video });
+      if (late) skipRepeat(id, late !== "hidden");
+    }, 250);
   }
 
-  function skipRepeat(id) {
+  // resume: play the video anyway when the sidebar has nothing better (a repeat beats stopping dead,
+  // but a filtered video stays paused).
+  function skipRepeat(id, resume = true) {
     const video = document.querySelector("#movie_player video");
     if (video) video.pause();
     let tries = 0;
     const timer = setInterval(() => {
-      const side = document.querySelector("ytd-watch-flexy #secondary");
-      const candidates = side
-        ? outermost(side, TILE)
-            .filter((t) => !t.hasAttribute(ATTR))
-            .map(tileInfo)
-            .filter((c) => c.kind === "video" && !c.members && !c.live && !c.upcoming && c.watchedPct == null)
-        : [];
-      const next = Y.pickNext(candidates, id, played, watched);
+      if (currentId() !== id) return clearInterval(timer); // you moved on yourself
+      const next = Y.pickNext(candidates(), id, played, watched);
       if (next || ++tries > 25) {
         clearInterval(timer);
         if (next) next.link.click();
-        else if (video) video.play(); // nothing new in the sidebar: keep the repeat rather than stop dead
+        else if (video && resume) video.play();
       }
     }, 300);
   }
