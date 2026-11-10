@@ -73,6 +73,7 @@ Needs Firefox or Zen 142 or newer.
   - `@channel hide "top 10"` hides the videos from that channel with those words in the title.
   - Several words in quotes on one line match any of them: `@channel hide "top 10" "ranked"`.
   - The channel is its name or @handle. A name with spaces works too: `@Some Channel hide "live"`.
+  - A line that looks wrong (no show or hide, a missing quote mark) gets a warning under the field.
   - Hidden extra: `@any hide "shorts"` (or a line with just `shorts`) hides those titles from every channel.
 - **Turn it all off:** the switch at the top of the popup pauses everything, so YouTube looks exactly as
   normal.

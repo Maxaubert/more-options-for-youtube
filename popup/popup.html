@@ -126,7 +126,8 @@
     </label>
     <label class="field">
       <span>Filter out, one per line</span>
-      <textarea data-key="blockWords" rows="2" spellcheck="false" placeholder="@channel show &quot;only videos with this title show&quot;&#10;@channel hide &quot;videos with this title do not show&quot;"></textarea>
+      <textarea data-key="blockWords" rows="2" spellcheck="false" placeholder="@channel show &quot;only videos with this title show&quot;&#10;@channel hide &quot;videos with this title do not show&quot;" aria-describedby="filter-warn"></textarea>
+      <div id="filter-warn" class="warn" role="status" hidden></div>
     </label>
   </section>
 
