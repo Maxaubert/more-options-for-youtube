@@ -98,10 +98,9 @@
   // so the path decides, not just the element.
   function pageRoot() {
     const p = location.pathname;
+    // Filters cover the home page and the list next to a video (what autoplay picks from).
+    // Search and Subscriptions are never filtered: there you look for something on purpose (Max, 2026-11-10).
     if (p === "/") return document.querySelector(HOME);
-    if (!settings.everywhere) return null;
-    if (p === "/results") return document.querySelector("ytd-search:not([hidden])");
-    if (p === "/feed/subscriptions") return document.querySelector('ytd-browse[page-subtype="subscriptions"]');
     if (p === "/watch") return document.querySelector("ytd-watch-flexy #secondary");
     return null;
   }
@@ -143,7 +142,7 @@
     }
     const root = pageRoot();
     if (!root) {
-      // A page the filters do not cover (or "everywhere" was just turned off): undo old marks, because YouTube
+      // A page the filters do not cover (Search, Subscriptions, ...): undo old marks, because YouTube
       // reuses these elements for other videos.
       for (const el of document.querySelectorAll(`[${ATTR}]`)) el.removeAttribute(ATTR);
       return;

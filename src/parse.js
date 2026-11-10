@@ -20,7 +20,6 @@
     maxAgeUnit: "years",
     minViews: false,
     minViewsValue: 1000,
-    everywhere: false, // also Search, Subscriptions and the sidebar next to a video (home page only by default, Max 2026-11-10)
     // Grid
     perRow: false,
     perRowValue: 3,
