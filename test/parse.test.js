@@ -154,9 +154,23 @@ test("title rules", () => {
     { channel: null, only: false, words: ["shorts"] },
     { channel: "@some channel", only: false, words: ["top 10", "ranked"] },
     { channel: "@chan", only: true, words: ["review"] },
+    { channel: "@chan only", only: false, words: ["review"] },
     { channel: "@x", only: false, words: ["word"] },
   ]);
-  const s = { ...S, blockWords: lines("reaction", '@any "shorts"', '@Some Channel "top 10"', '@chan only "review" "before you buy"') };
+  // show / hide keywords, with and without quotes, and a channel whose name ends in "Show"
+  assert.deepEqual(Y.parseTitleRules(lines('@chan show "a"', '@Chan HIDE "b"', "@chan show c d", '@The Late Show "x"')), [
+    { channel: "@chan", only: true, words: ["a"] },
+    { channel: "@chan show", only: false, words: ["a"] },
+    { channel: "@chan", only: false, words: ["b"] },
+    { channel: "@chan hide", only: false, words: ["b"] },
+    { channel: "@chan", only: true, words: ["c d"] },
+    { channel: "@chan show", only: false, words: ["c d"] },
+    { channel: "@the late", only: true, words: ["x"] },
+    { channel: "@the late show", only: false, words: ["x"] },
+  ]);
+  assert.equal(Y.decideTile(video({ channel: "The Late Show", title: "X marks it" }), { ...S, blockWords: '@The Late Show "x"' }), "blocked");
+  assert.equal(Y.decideTile(video({ channel: "The Late Show", title: "Other" }), { ...S, blockWords: '@The Late Show "x"' }), null);
+  const s = { ...S, blockWords: lines("reaction", '@any "shorts"', '@Some Channel hide "top 10"', '@chan show "review" "before you buy"') };
   const c = (title, extra) => video({ channel: "Chan", title, ...extra });
   assert.equal(Y.decideTile(video({ title: "My REACTION" }), s), "blocked");
   assert.equal(Y.decideTile(video({ title: "Best shorts ever" }), s), "blocked");
@@ -170,14 +184,14 @@ test("title rules", () => {
   assert.equal(Y.decideTile(c("Top 10 games"), { ...s, enabled: false }), null);
 });
 
-test("0.3.8 keep-only lines move into the Titles field", () => {
+test("0.3.8 keep-only lines move into the Filter out field", () => {
   assert.equal(Y.migrateKeepOnly({ keepOnly: "", blockWords: "x" }), null);
   assert.deepEqual(Y.migrateKeepOnly({ keepOnly: "Chan: *Before you buy* | Review\nno colon", blockWords: "reaction\n" }), {
     keepOnly: "",
-    blockWords: 'reaction\n@Chan only "before you buy" "review"',
+    blockWords: 'reaction\n@Chan show "before you buy" "review"',
   });
   const moved = Y.migrateKeepOnly({ keepOnly: "@chan: review", blockWords: "" });
-  assert.equal(moved.blockWords, '@chan only "review"');
+  assert.equal(moved.blockWords, '@chan show "review"');
   assert.equal(Y.decideTile(video({ channel: "Chan", title: "Vlog" }), { ...S, ...moved }), "keepOnly");
 });
 

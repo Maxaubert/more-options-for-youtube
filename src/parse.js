@@ -152,12 +152,13 @@
     return !!info.handle && info.handle.toLowerCase() === c;
   }
 
-  // Title rules, one per line (the "Titles" field):
-  //   shorts                      block titles with "shorts" from any channel (old plain form, commas split)
-  //   @any "shorts"               the same
-  //   @channel "top 10" "ranked"  block those titles from one channel (name or @handle)
-  //   @channel only "review"      keep only those titles from that channel, hide the rest
+  // Title rules, one per line (the "Filter out" field):
+  //   @channel hide "top 10" "ranked"  hide those titles from one channel (name or @handle); "hide" may be left out
+  //   @channel show "review"           show only those titles from that channel, hide the rest ("only" also works)
+  //   shorts, @any "shorts"            older forms, still read: hide titles with "shorts" from every channel
   // -> [{channel: "@channel" | null, only, words}]. "*" is ignored, so "*before you buy*" works too.
+  // A channel whose name ends in "show" or "hide" ("@The Late Show "x"") also gets a hide rule under its full name.
+  const KEYWORD = /(^|\s)(show|only|hide)$/i;
   const rulesCache = new Map();
   const cleanWord = (w) => w.replace(/[*"]/g, "").trim().toLowerCase();
   function parseTitleRules(text) {
@@ -178,16 +179,19 @@
           head = line.slice(1, quote).trim();
           words = [...line.slice(quote).matchAll(/"([^"]*)"?/g)].map((m) => cleanWord(m[1])).filter(Boolean);
         } else {
-          // No quotes: "@channel word" (a channel name with spaces needs the quotes)
+          // No quotes: "@channel [show|hide] words" (a channel name with spaces needs the quotes)
           const [first, ...rest] = line.slice(1).split(/\s+/);
           head = first;
+          if (rest.length > 1 && /^(show|only|hide)$/i.test(rest[0])) head += " " + rest.shift();
           words = [cleanWord(rest.join(" "))].filter(Boolean);
         }
-        const only = /(^|\s)only$/i.test(head);
-        if (only) head = head.replace(/(^|\s)only$/i, "").trim();
-        const name = head.toLowerCase();
+        const full = head.toLowerCase();
+        const keyword = (KEYWORD.exec(head) || [])[2];
+        const only = !!keyword && keyword.toLowerCase() !== "hide";
+        const name = keyword ? head.replace(KEYWORD, "").trim().toLowerCase() : full;
         if (!words.length || (!name && !only)) continue;
         rules.push({ channel: !name || name === "any" ? null : "@" + name, only, words });
+        if (keyword && name) rules.push({ channel: "@" + full, only: false, words });
       }
       rulesCache.set(text, rules);
     }
@@ -213,8 +217,8 @@
     return rules.length > 0 && !rules.some((r) => titleHas(title, r));
   }
 
-  // 0.3.8 had a separate "keepOnly" field ("Gameranx: before you buy | review"). Returns the storage
-  // change that moves its lines into the Titles field as "@Gameranx only ..." rules, or null.
+  // 0.3.8 had a separate "keepOnly" field ("Channel: a | b"). Returns the storage
+  // change that moves its lines into the Filter out field as "@Channel show ..." rules, or null.
   function migrateKeepOnly(s) {
     if (!s.keepOnly) return null;
     const moved = s.keepOnly
@@ -224,7 +228,7 @@
         if (at < 0) return "";
         const words = line.slice(at + 1).split("|").map(cleanWord).filter(Boolean);
         const name = line.slice(0, at).trim().replace(/^@/, "");
-        return name && words.length ? `@${name} only ${words.map((w) => `"${w}"`).join(" ")}` : "";
+        return name && words.length ? `@${name} show ${words.map((w) => `"${w}"`).join(" ")}` : "";
       })
       .filter(Boolean);
     const words = (s.blockWords || "").trim();
