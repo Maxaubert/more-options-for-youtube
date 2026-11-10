@@ -34,7 +34,7 @@ A calmer YouTube, on your terms.
 - Channels and title words you list, or straight from a video's ⋮ menu with "Block channel"
 - Filter a channel by title: show only one series from a channel, or hide some of its titles
 
-Works on the home page and in the list next to a video. Search and Subscriptions stay as YouTube shows them.
+Works on the home page. Search and Subscriptions stay as YouTube shows them, and autoplay never plays a video your filters hide.
 
 **A tidier grid**
 - Choose how many videos per row for bigger thumbnails

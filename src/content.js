@@ -98,10 +98,9 @@
   // so the path decides, not just the element.
   function pageRoot() {
     const p = location.pathname;
-    // Filters cover the home page and the list next to a video (what autoplay picks from).
-    // Search and Subscriptions are never filtered: there you look for something on purpose (Max, 2026-11-10).
+    // Only the home page is filtered on screen. Search, Subscriptions and the list next to a video stay as
+    // YouTube shows them; autoplay still skips filtered videos on its own (candidates(), autoplaySkip) (Max, 2026-11-10).
     if (p === "/") return document.querySelector(HOME);
-    if (p === "/watch") return document.querySelector("ytd-watch-flexy #secondary");
     return null;
   }
 
@@ -142,9 +141,10 @@
     }
     const root = pageRoot();
     if (!root) {
-      // A page the filters do not cover (Search, Subscriptions, ...): undo old marks, because YouTube
-      // reuses these elements for other videos.
-      for (const el of document.querySelectorAll(`[${ATTR}]`)) el.removeAttribute(ATTR);
+      // Off the home page: undo marks left on other pages, because YouTube reuses those elements for other
+      // videos. Never touch the home grid: it is still on screen right after you click a video, and
+      // un-hiding tiles there made the grid jump as if you had clicked the wrong video.
+      for (const el of document.querySelectorAll(`[${ATTR}]`)) if (!el.closest(HOME)) el.removeAttribute(ATTR);
       return;
     }
     for (const shelf of outermost(root, SHELF)) mark(shelf, Y.decideShelf(shelfInfo(shelf), settings));
@@ -375,8 +375,17 @@
 
   // --- Wiring ---------------------------------------------------------------------------------
   let timer = 0;
+  // No filtering between leaving a page and the next page being ready, so nothing moves under the click.
+  let navigating = false;
+  let navTimer = 0;
+  document.addEventListener("yt-navigate-start", () => {
+    navigating = true;
+    clearTimeout(navTimer);
+    navTimer = setTimeout(() => (navigating = false), 5000); // a page change YouTube cancels must not stop filtering
+  }, true);
+
   function schedule() {
-    if (timer) return;
+    if (timer || navigating) return;
     timer = setTimeout(() => {
       timer = 0;
       run();
@@ -447,6 +456,7 @@
     if (!muts.every(insidePlayer)) schedule();
   }).observe(ROOT, { childList: true, subtree: true, characterData: true });
   document.addEventListener("yt-navigate-finish", () => {
+    navigating = false;
     shortsToWatch();
     if (location.pathname === "/watch") onWatchPage();
     schedule();

@@ -37,7 +37,8 @@ sent anywhere.
 - Channels (name or @handle) and title words you list, or straight from a video's ⋮ menu with
   **Block channel**.
 - Filter a channel by title: show only one series from a channel, or hide some of its titles.
-- On the home page and in the list next to a video. Search and Subscriptions are never filtered.
+- On the home page. Search, Subscriptions and the list next to a video stay as YouTube shows them, but
+  autoplay never plays a video your filters hide.
 
 **A tidier grid**
 - Choose how many videos per row; tiles grow past YouTube's usual 700 px cap.
@@ -93,7 +94,7 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 - **Show if member:** the add-on reads your own memberships page on YouTube (youtube.com/paid_memberships)
   once a day to know which channels you pay for. The list stays in your browser. When you are logged out,
   it does not save an answer.
-- **Defaults:** filters work on the home page and next to a video, never in Search or Subscriptions. Shorts and news rows are hidden, autoplay skips repeats,
+- **Defaults:** filters work on the home page only, and autoplay skips what they hide. Shorts and news rows are hidden, autoplay skips repeats,
   and members-only videos show only for your memberships. Everything else starts off.
 
 ## Privacy
