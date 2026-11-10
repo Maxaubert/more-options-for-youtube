@@ -1,7 +1,7 @@
 # Store listing draft (addons.mozilla.org)
 
 Draft for the public listing. **Max submits it himself**; nothing here is uploaded automatically.
-Status 2026-11-10: 0.4.3 (Filter out field with @channel show / hide) uploaded to the listed channel; it replaces 0.4.1 in review.
+Status 2026-11-10: 0.4.5 (Filter out field with show / hide and warnings) uploaded to the listed channel; it replaces 0.4.3 in review.
 
 ## Name
 
@@ -71,7 +71,7 @@ reports and ideas are welcome there.
 ## How to submit (Max does this)
 
 The add-on already exists on AMO as unlisted (same ID, `yt-filter@loftspace`), so the public listing is a new
-version of it. Every upload needs a version number AMO has not seen; the unlisted ones used 0.1.0 to 0.3.1, 0.3.4 to 0.3.6, 0.3.8, 0.4.0 and 0.4.2.
+version of it. Every upload needs a version number AMO has not seen; the unlisted ones used 0.1.0 to 0.3.1, 0.3.4 to 0.3.6, 0.3.8, 0.4.0, 0.4.2 and 0.4.4.
 
 Pattern (2026-11-10): sign version N unlisted for the local install (`npm run sign`), then bump to N+1 and
 upload that to the listed channel:
