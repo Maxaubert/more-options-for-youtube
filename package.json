@@ -1,6 +1,6 @@
 {
   "name": "more-options-for-youtube",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "private": true,
   "description": "Browser extension (Firefox, Zen, Chrome, Safari) that filters YouTube and sets player defaults",
   "scripts": {
@@ -9,6 +9,7 @@
     "dev": "web-ext run --ignore-files test docs dist package.json package-lock.json scripts README.md --start-url https://www.youtube.com/",
     "build:chrome": "node scripts/build-chrome.mjs",
     "publish:chrome": "python scripts/publish-chrome.py",
+    "publish:amo": "python scripts/sign.py listed",
     "build": "web-ext build --overwrite-dest --ignore-files test docs dist package.json package-lock.json scripts README.md",
     "sign": "python scripts/sign.py"
   },

@@ -17,7 +17,8 @@ Firefox/Zen, Chrome/Edge and Safari. Plain JavaScript, no bundler.
 npm test               # unit tests (node:test)
 npm run lint           # web-ext lint (Firefox)
 npm run build:chrome   # dist/chrome + Chrome zip (also the Safari source)
-npm run sign           # sign an unlisted Firefox build (.xpi) for the local Zen install
+npm run sign           # sign <version>.1 unlisted (.xpi) for the local Zen install
+npm run publish:amo    # send <version> to the AMO listing for review
 npm run publish:chrome # upload to the Chrome Web Store and send for review
 ```
 
@@ -26,13 +27,16 @@ npm run publish:chrome # upload to the Chrome Web Store and send for review
 - Gates: `npm test` and `npm run lint` must pass. Check popup changes headless (Playwright with a stubbed
   `browser` object). Never open windows on the user's screen without asking.
 - Version: bump `manifest.json` and `package.json` together in the PR. Patch for fixes, minor for features.
-- Local Zen install: `npm run sign`, then open the .xpi in Zen. The user clicks Add.
-- AMO listed: AMO keeps one version list for both channels. After an unlisted signing of version N, the
-  listed upload must be N+1: `npx web-ext sign --channel listed --approval-timeout 0` with the AMO keys
-  from Credential Manager (see `scripts/sign.py`).
-- Chrome Web Store: `npm run publish:chrome`. See [docs/chrome-web-store.md](docs/chrome-web-store.md).
-- Safari: built on a Mac. See [docs/safari.md](docs/safari.md).
-- Store text and status: [docs/store-listing.md](docs/store-listing.md).
+- **On every merge with a version bump, update both stores and Zen right away (Max's rule, 2026-11-10).
+  The merge yes covers these steps; do not ask again:**
+  1. `npm run publish:amo`: sends the version to the AMO listing for review.
+  2. `npm run publish:chrome -- --replace`: sends it to the Chrome Web Store (cancels a version still in review).
+  3. `npm run sign`: signs `<version>.1` unlisted, then open that .xpi in Zen. The user clicks Add.
+  Docs- or tooling-only PRs without a version bump need none of this.
+- Why `.1`: AMO keeps one version list for both channels. The local build uses `<version>.1`, so the store
+  always gets the clean version.
+- Details: [docs/chrome-web-store.md](docs/chrome-web-store.md), [docs/safari.md](docs/safari.md) (built on a Mac),
+  store text and status in [docs/store-listing.md](docs/store-listing.md).
 
 ## Secrets
 
