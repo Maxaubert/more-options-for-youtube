@@ -360,11 +360,25 @@
     return candidates.find((c) => c.id && c.id !== current && !played.has(c.id) && !watched.has(c.id)) || null;
   }
 
+  // Why smart autoplay should skip a video it just landed on, or null to keep it.
+  // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel} from the player.
+  function autoplaySkip(id, { played, watched, tile, video, settings }) {
+    if (played.has(id)) return "played";
+    if (watched.has(id)) return "watched";
+    if (tile && tile.watchedPct != null) return "watched";
+    if (tile && tile.reason) return "hidden";
+    if (video && video.title) {
+      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "" }, settings);
+      if (reason === "blocked" || reason === "keepOnly") return "hidden";
+    }
+    return null;
+  }
+
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
-    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext,
+    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, autoplaySkip,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;

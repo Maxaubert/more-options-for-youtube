@@ -71,10 +71,23 @@
     return true;
   }
 
+  // The playing video's title and channel, straight from the player, for smart autoplay in content.js.
+  function publishVideo(p, id) {
+    try {
+      const d = p.getVideoData ? p.getVideoData() : null;
+      if (!d || d.video_id !== id || !d.title) return;
+      const json = JSON.stringify({ id, title: d.title, channel: d.author || "" });
+      if (document.documentElement.dataset.ytfVideo !== json) document.documentElement.dataset.ytfVideo = json;
+    } catch {
+      // player API changed: smart autoplay falls back to the sidebar tiles
+    }
+  }
+
   function apply() {
     if (location.pathname !== "/watch") return;
     const id = new URLSearchParams(location.search).get("v");
     const p = document.getElementById("movie_player");
+    if (id && p) publishVideo(p, id);
     if (!id || !p || id === doneFor) return;
     const s = settings();
     if (!s.enabled) return;
