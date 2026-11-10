@@ -5,133 +5,130 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.7 5.1A10 10 0 0 1 22 12a13 13 0 0 1-1.7 2.7M6.6 6.6A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M2 2l20 20M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></symbol>
+    <symbol id="i-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+  </svg>
+
   <header>
+    <img src="../icons/icon.svg" alt="" width="30" height="30">
     <h1>More Options</h1>
-    <label class="switch" title="Turn all filters on or off">
-      <input type="checkbox" data-key="enabled">
+    <label class="tog big" title="Turn all filters on or off">
+      <input type="checkbox" data-key="enabled" aria-label="All filters">
       <span></span>
     </label>
   </header>
 
-  <section>
-    <h2>Hide</h2>
-    <label class="row"><span>Shorts</span><input type="checkbox" data-key="shorts"></label>
-    <label class="row"><span>Playables</span><input type="checkbox" data-key="playables"></label>
-    <label class="row"><span>News and Trending rows</span><input type="checkbox" data-key="news"></label>
-    <label class="row"><span>Live and upcoming</span><input type="checkbox" data-key="live"></label>
-    <label class="row"><span>Mixes</span><input type="checkbox" data-key="mixes"></label>
-    <label class="row"><span>Playlists</span><input type="checkbox" data-key="playlists"></label>
-    <div class="row select-row">
-      <span>Members-only videos</span>
-      <select data-key="membersMode" aria-label="Members-only videos">
-        <option value="always">Always hide</option>
-        <option value="unlessMember">Show if member</option>
-        <option value="never">Show</option>
-      </select>
-    </div>
-  </section>
+  <nav class="tabs" role="tablist" aria-label="Settings">
+    <button role="tab" id="tab-hide" aria-controls="pane-hide" aria-selected="true"><svg aria-hidden="true"><use href="#i-eye"/></svg>Hide</button>
+    <button role="tab" id="tab-grid" aria-controls="pane-grid" aria-selected="false"><svg aria-hidden="true"><use href="#i-grid"/></svg>Grid</button>
+    <button role="tab" id="tab-play" aria-controls="pane-play" aria-selected="false"><svg aria-hidden="true"><use href="#i-play"/></svg>Player</button>
+    <button role="tab" id="tab-block" aria-controls="pane-block" aria-selected="false"><svg aria-hidden="true"><use href="#i-block"/></svg>Block</button>
+  </nav>
 
-  <section>
-    <h2>Rules</h2>
-    <div class="rule">
-      <label class="row"><span>No older than</span><input type="checkbox" data-key="maxAge"></label>
-      <div class="inputs">
-        <input type="number" min="1" data-key="maxAgeValue" aria-label="Age">
-        <select data-key="maxAgeUnit" aria-label="Unit">
-          <option value="days">days</option>
-          <option value="weeks">weeks</option>
-          <option value="months">months</option>
-          <option value="years">years</option>
-        </select>
-      </div>
+  <main class="panes">
+    <div class="pane" id="pane-hide" role="tabpanel" aria-labelledby="tab-hide">
+      <section>
+        <label class="row"><span>Shorts</span><span class="tog"><input type="checkbox" data-key="shorts"><span></span></span></label>
+        <label class="row"><span>Playables</span><span class="tog"><input type="checkbox" data-key="playables"><span></span></span></label>
+        <label class="row"><span>News and Trending rows</span><span class="tog"><input type="checkbox" data-key="news"><span></span></span></label>
+        <label class="row"><span>Live and upcoming</span><span class="tog"><input type="checkbox" data-key="live"><span></span></span></label>
+        <label class="row"><span>Mixes</span><span class="tog"><input type="checkbox" data-key="mixes"><span></span></span></label>
+        <label class="row"><span>Playlists</span><span class="tog"><input type="checkbox" data-key="playlists"><span></span></span></label>
+        <div class="stack"><span id="lbl-members">Members-only videos</span>
+          <div class="seg" data-key="membersMode" role="group" aria-labelledby="lbl-members">
+            <button data-value="always">Hide</button><button data-value="unlessMember">If member</button><button data-value="never">Show</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="rule">
+          <label class="row"><span>Hide old videos</span><span class="tog"><input type="checkbox" data-key="maxAge"><span></span></span></label>
+          <div class="more"><div><div class="sentence">Older than
+            <input type="number" min="1" data-key="maxAgeValue" aria-label="Age">
+            <select data-key="maxAgeUnit" aria-label="Unit">
+              <option value="days">days</option>
+              <option value="weeks">weeks</option>
+              <option value="months">months</option>
+              <option value="years">years</option>
+            </select>
+          </div></div></div>
+        </div>
+        <div class="rule">
+          <label class="row"><span>Hide low views</span><span class="tog"><input type="checkbox" data-key="minViews"><span></span></span></label>
+          <div class="more"><div><div class="sentence">Fewer than
+            <input type="number" min="0" step="100" data-key="minViewsValue" aria-label="Views"> views
+          </div></div></div>
+        </div>
+        <div class="rule">
+          <label class="row"><span>Hide watched</span><span class="tog"><input type="checkbox" data-key="watched"><span></span></span></label>
+          <div class="more"><div><div class="sentence">Watched more than
+            <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"> %
+          </div></div></div>
+        </div>
+        <label class="row"><span>Also on Search, Subscriptions and the video sidebar</span><span class="tog"><input type="checkbox" data-key="everywhere"><span></span></span></label>
+      </section>
     </div>
-    <div class="rule">
-      <label class="row"><span>No fewer views than</span><input type="checkbox" data-key="minViews"></label>
-      <div class="inputs">
-        <input type="number" min="0" step="100" data-key="minViewsValue" aria-label="Views"><span>views</span>
-      </div>
-    </div>
-    <div class="rule">
-      <label class="row"><span>No more watch time than</span><input type="checkbox" data-key="watched"></label>
-      <div class="inputs">
-        <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"><span>% watched</span>
-      </div>
-    </div>
-    <label class="row"><span>Also on Search, Subscriptions and the video sidebar</span><input type="checkbox" data-key="everywhere"></label>
-  </section>
 
-  <section>
-    <h2>Grid</h2>
-    <div class="rule">
-      <label class="row"><span>Videos per row</span><input type="checkbox" data-key="perRow"></label>
-      <div class="inputs">
-        <input type="number" min="1" max="8" data-key="perRowValue" aria-label="Videos per row"><span>per row</span>
-      </div>
+    <div class="pane" id="pane-grid" role="tabpanel" aria-labelledby="tab-grid" hidden>
+      <section>
+        <div class="stack"><span id="lbl-perrow">Videos per row</span>
+          <div class="seg" data-key="perRowValue" data-switch="perRow" data-number role="group" aria-labelledby="lbl-perrow">
+            <button data-value="off">Auto</button><button data-value="2">2</button><button data-value="3">3</button><button data-value="4">4</button><button data-value="5">5</button><button data-value="6">6</button>
+          </div>
+        </div>
+        <label class="row"><span>Hide titles</span><span class="tog"><input type="checkbox" data-key="hideTitles"><span></span></span></label>
+        <label class="row"><span>Hide channel names</span><span class="tog"><input type="checkbox" data-key="hideChannels"><span></span></span></label>
+        <label class="row"><span>Hide channel icons</span><span class="tog"><input type="checkbox" data-key="hideAvatars"><span></span></span></label>
+        <label class="row"><span>Hide views, dates and likes</span><span class="tog"><input type="checkbox" data-key="hideMeta"><span></span></span></label>
+        <label class="row"><span>No previews on hover</span><span class="tog"><input type="checkbox" data-key="noPreview"><span></span></span></label>
+      </section>
     </div>
-    <label class="row"><span>Hide titles</span><input type="checkbox" data-key="hideTitles"></label>
-    <label class="row"><span>Hide channel names</span><input type="checkbox" data-key="hideChannels"></label>
-    <label class="row"><span>Hide channel icons</span><input type="checkbox" data-key="hideAvatars"></label>
-    <label class="row"><span>Hide views, dates and likes</span><input type="checkbox" data-key="hideMeta"></label>
-  </section>
 
-  <section>
-    <h2>Playback</h2>
-    <label class="row"><span>No previews on hover</span><input type="checkbox" data-key="noPreview"></label>
-    <label class="row"><span>Autoplay skips watched and repeats</span><input type="checkbox" data-key="smartAutoplay"></label>
-    <div class="rule">
-      <label class="row"><span>Start at speed</span><input type="checkbox" data-key="speed"></label>
-      <div class="inputs">
-        <select data-key="speedValue" aria-label="Speed">
-          <option value="1">1x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2">2x</option>
-        </select>
-      </div>
+    <div class="pane" id="pane-play" role="tabpanel" aria-labelledby="tab-play" hidden>
+      <section>
+        <label class="row"><span>Autoplay skips watched and repeats</span><span class="tog"><input type="checkbox" data-key="smartAutoplay"><span></span></span></label>
+        <div class="stack"><span id="lbl-speed">Start at speed</span>
+          <div class="seg" data-key="speedValue" data-switch="speed" role="group" aria-labelledby="lbl-speed">
+            <button data-value="off">Off</button><button data-value="1">1</button><button data-value="1.25">1.25</button><button data-value="1.5">1.5</button><button data-value="1.75">1.75</button><button data-value="2">2</button>
+          </div>
+        </div>
+        <div class="stack"><span id="lbl-quality">Start at quality</span>
+          <div class="seg" data-key="qualityValue" data-switch="quality" role="group" aria-labelledby="lbl-quality">
+            <button data-value="off">Off</button><button data-value="highest">Best</button><button data-value="2160">4K</button><button data-value="1440">1440</button><button data-value="1080">1080</button><button data-value="720">720</button>
+          </div>
+        </div>
+        <div class="stack"><span id="lbl-subs">Subtitles</span>
+          <div class="seg" data-key="subtitles" role="group" aria-labelledby="lbl-subs">
+            <button data-value="default">YouTube</button><button data-value="off">Off</button><button data-value="no">Norsk</button><button data-value="en">English</button>
+          </div>
+        </div>
+        <label class="row"><span>Theater mode</span><span class="tog"><input type="checkbox" data-key="theater"><span></span></span></label>
+        <label class="row"><span>Open Shorts in the normal player</span><span class="tog"><input type="checkbox" data-key="shortsAsVideo"><span></span></span></label>
+        <label class="row"><span>Hide end cards</span><span class="tog"><input type="checkbox" data-key="noEndCards"><span></span></span></label>
+        <label class="row"><span>Hide comments</span><span class="tog"><input type="checkbox" data-key="noComments"><span></span></span></label>
+      </section>
     </div>
-    <div class="rule">
-      <label class="row"><span>Start at quality</span><input type="checkbox" data-key="quality"></label>
-      <div class="inputs">
-        <select data-key="qualityValue" aria-label="Quality">
-          <option value="highest">Highest</option>
-          <option value="2160">4K</option>
-          <option value="1440">1440p</option>
-          <option value="1080">1080p</option>
-          <option value="720">720p</option>
-          <option value="480">480p</option>
-        </select>
-      </div>
-    </div>
-    <label class="row"><span>Theater mode</span><input type="checkbox" data-key="theater"></label>
-    <label class="row"><span>Open Shorts in the normal player</span><input type="checkbox" data-key="shortsAsVideo"></label>
-    <label class="row"><span>Hide end cards</span><input type="checkbox" data-key="noEndCards"></label>
-    <label class="row"><span>Hide comments</span><input type="checkbox" data-key="noComments"></label>
-    <div class="row select-row">
-      <span>Subtitles</span>
-      <select data-key="subtitles" aria-label="Subtitles">
-        <option value="default">YouTube decides</option>
-        <option value="off">Always off</option>
-        <option value="no">Always Norwegian</option>
-        <option value="en">Always English</option>
-      </select>
-    </div>
-  </section>
 
-  <section>
-    <h2>Block</h2>
-    <label class="field">
-      <span>Channels, one per line</span>
-      <textarea data-key="blockChannels" rows="3" spellcheck="false" placeholder="Channel name or @handle"></textarea>
-    </label>
-    <label class="field">
-      <span>Filter out, one per line</span>
-      <textarea data-key="blockWords" rows="2" spellcheck="false" placeholder="@channel show &quot;only videos with this title show&quot;&#10;@channel hide &quot;videos with this title do not show&quot;" aria-describedby="filter-warn"></textarea>
-      <div id="filter-warn" class="warn" role="status" hidden></div>
-    </label>
-  </section>
+    <div class="pane" id="pane-block" role="tabpanel" aria-labelledby="tab-block" hidden>
+      <section>
+        <label class="field">
+          <span>Channels, one per line</span>
+          <textarea data-key="blockChannels" rows="1" spellcheck="false" placeholder="Channel name or @handle"></textarea>
+        </label>
+        <div class="field">
+          <label for="filter-out">Filter out, one per line</label>
+          <textarea id="filter-out" data-key="blockWords" rows="2" spellcheck="false" placeholder="@channel show &quot;only videos with this title show&quot;&#10;@channel hide &quot;videos with this title do not show&quot;" aria-describedby="filter-read"></textarea>
+          <div id="filter-read" class="readback" role="status"></div>
+        </div>
+      </section>
+    </div>
+  </main>
 
-  <footer id="stats" hidden></footer>
+  <footer id="stats" class="foot" hidden></footer>
   <script src="../src/parse.js"></script>
   <script src="popup.js"></script>
 </body>

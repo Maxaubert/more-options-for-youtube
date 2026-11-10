@@ -63,12 +63,12 @@ Needs Firefox or Zen 142 or newer.
 
 ## Usage
 
-- **Settings:** click the toolbar icon. Every change applies immediately, no reload.
+- **Settings:** click the toolbar icon. Settings sit in four tabs: Hide, Grid, Player and Block. Every change applies immediately, no reload.
 - **Hidden count:** on a page the filters cover, the bottom of the popup shows how many videos were hidden
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
-  Block section (one per line). Remove a line to unblock.
-- **Filter out:** the Filter out field in the Block section takes one rule per line. Case does not matter.
+  Block tab (one per line). Remove a line to unblock.
+- **Filter out:** the Filter out field in the Block tab takes one rule per line. Case does not matter.
   - `@channel show "before you buy"` shows only the videos from that channel with those words in the title.
   - `@channel hide "top 10"` hides the videos from that channel with those words in the title.
   - Several words in quotes on one line match any of them: `@channel hide "top 10" "ranked"`.
