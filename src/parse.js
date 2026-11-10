@@ -360,6 +360,15 @@
     return candidates.find((c) => c.id && c.id !== current && !played.has(c.id) && !watched.has(c.id)) || null;
   }
 
+  // Whether a move to another video was YouTube's autoplay and not the user. YouTube can start the next video
+  // before the old one fires "ended", so the test is: the old video was at its end (ended, or in its last
+  // 30 seconds) and the user did not click or press a key in the last 3 seconds. The Back button in the middle
+  // of a video is not autoplay.
+  function wasAutoplay({ fromWatch, ended, duration, currentTime, msSinceUser }) {
+    if (!fromWatch || msSinceUser < 3000) return false;
+    return !!ended || (duration > 0 && duration - currentTime < 30);
+  }
+
   // Why smart autoplay should skip a video it just landed on, or null to keep it.
   // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel} from the player.
   function autoplaySkip(id, { played, watched, tile, video, settings }) {
@@ -378,7 +387,7 @@
     DEFAULTS, REASONS, UNIT_DAYS,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
-    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, autoplaySkip,
+    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;

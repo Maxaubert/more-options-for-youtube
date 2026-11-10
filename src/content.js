@@ -197,6 +197,18 @@
   let endedAt = 0;
   let userAt = 0;
   let ourPick = "";
+  // Set when YouTube moves on from a video at its end without the user (see Y.wasAutoplay).
+  let navByAutoplay = false;
+  document.addEventListener("yt-navigate-start", () => {
+    const v = document.querySelector("#movie_player video");
+    navByAutoplay = Y.wasAutoplay({
+      fromWatch: location.pathname === "/watch",
+      ended: v && v.ended,
+      duration: v ? v.duration : 0,
+      currentTime: v ? v.currentTime : 0,
+      msSinceUser: Date.now() - userAt,
+    });
+  }, true);
   document.addEventListener("ended", (e) => {
     const player = e.target.closest && e.target.closest("#movie_player");
     if (!player || player.classList.contains("ad-showing")) return;
@@ -264,7 +276,8 @@
   function onWatchPage() {
     const id = currentId();
     if (!id) return;
-    const autoplayed = endedAt && Date.now() - endedAt < 20000 && userAt < endedAt;
+    const autoplayed = navByAutoplay || (endedAt && Date.now() - endedAt < 20000 && userAt < endedAt);
+    navByAutoplay = false;
     endedAt = 0;
     const picked = ourPick === id;
     ourPick = "";
