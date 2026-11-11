@@ -168,12 +168,15 @@
     const count = document.styleSheets.length;
     if (count === themeSheets) return;
     themeSheets = count;
-    const entries = [];
+    // [dark] rules go last so they win over :root (see Y.themeVarOverrides).
+    const root = [];
+    const dark = [];
     const walk = (rules) => {
       for (const r of rules) {
         if (r.cssRules && !r.style) walk(r.cssRules);
-        else if (r.style && /^(:root|\[dark\])$/.test(r.selectorText)) {
-          for (const name of r.style) if (name.startsWith("--")) entries.push([name, r.style.getPropertyValue(name)]);
+        else if (r.style && (r.selectorText === ":root" || r.selectorText === "[dark]")) {
+          const into = r.selectorText === ":root" ? root : dark;
+          for (const name of r.style) if (name.startsWith("--")) into.push([name, r.style.getPropertyValue(name)]);
         }
       }
     };
@@ -184,7 +187,7 @@
         // a style sheet from another site: not readable, and not YouTube's colours
       }
     }
-    const lines = Y.themeVarOverrides(entries);
+    const lines = Y.themeVarOverrides([...root, ...dark]);
     let style = document.getElementById("ytf-theme-vars");
     if (!style) {
       style = document.createElement("style");

@@ -79,7 +79,7 @@
   // YouTube also keeps its colours in variables with scrambled names (--t + 16 hex digits) that change with
   // each YouTube release. They hold plain colours, so a theme finds them by value instead: each colour of
   // YouTube's dark palette maps to the theme's own variable. entries: [[name, value]] read from YouTube's
-  // :root and [dark] rules. Returns "name: value" declarations for the theme block.
+  // :root rules, then its [dark] rules (later entries win). Returns "name: value" declarations for the theme block.
   const DARK_PALETTE = {
     "#0f0f0f": "var(--ytf-bg)",
     "#181818": "var(--ytf-surface)",
@@ -99,6 +99,8 @@
       let to = DARK_PALETTE[value];
       const glass = /^rgba\(15, ?15, ?15, ?(0|0?\.\d+|1)\)$/.exec(value);
       if (glass) to = `rgba(var(--ytf-bg-rgb), ${glass[1]})`;
+      // A later entry wins, also when its colour is not in the palette (then the variable is left alone).
+      out.delete(name);
       if (to) out.set(name, to);
     }
     return [...out].map(([name, to]) => `${name}: ${to} !important;`);

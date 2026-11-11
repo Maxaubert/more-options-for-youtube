@@ -316,11 +316,13 @@ test("theme finds YouTube's scrambled colour variables by value", () => {
     ["--t2222222222222222", "#3ea6ff"], // not a palette colour: left alone
     ["--other", "#0f0f0f"], // not a YouTube colour variable
     ["--t0123456789abcdef", "#0f0f0f"], // twice: one line
+    ["--t3333333333333333", "#0f0f0f"], // a :root value ...
+    ["--t3333333333333333", "#fff"], // ... that [dark] changes to a colour outside the palette: left alone
   ]);
   assert.deepEqual(out, [
     "--tffc2fd3a644f6275: var(--ytf-text) !important;",
-    "--t0123456789abcdef: var(--ytf-bg) !important;",
     "--t1111111111111111: rgba(var(--ytf-bg-rgb), 0.8) !important;",
     "--yt-spec-raised-background: var(--ytf-raised) !important;",
+    "--t0123456789abcdef: var(--ytf-bg) !important;",
   ]);
 });

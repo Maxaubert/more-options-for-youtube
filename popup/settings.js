@@ -176,6 +176,12 @@
       if (first) mark(first);
     }, { rootMargin: "-10% 0px -60% 0px" });
     for (const id of byId.keys()) watch.observe(document.getElementById(id));
+    // A short last section never reaches the band above: at the bottom of the page, mark it.
+    const last = links[links.length - 1].getAttribute("href").slice(1);
+    addEventListener("scroll", () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) mark(last);
+    }, { passive: true });
+    for (const a of links) a.addEventListener("click", () => setTimeout(() => mark(a.getAttribute("href").slice(1)), 600));
     mark(links[0].getAttribute("href").slice(1));
   }
 
