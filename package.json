@@ -1,6 +1,6 @@
 {
   "name": "more-options-for-youtube",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "description": "Browser extension (Firefox, Zen, Chrome, Safari) that filters YouTube and sets player defaults",
   "scripts": {
