@@ -49,7 +49,8 @@ sent anywhere.
   (Home, Shorts, Subscriptions, You).
 
 **Your look**
-- Themes: Black (pure black for OLED screens) or Dim (a soft dark blue). They build on YouTube's dark theme.
+- Dark themes: Black (pure black for OLED screens), Midnight (deep navy with a soft blue glow), Ember (warm brown)
+  and Forest (dark green). They build on YouTube's dark theme.
 - Your own accent colour in place of YouTube red: the progress bar, the watched bar on thumbnails, badges.
 
 **Your player, your defaults**
@@ -85,7 +86,7 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 ## Usage
 
 - **Settings:** click the toolbar icon. The popup holds the switches you use most: theme, what to hide, autoplay,
-  speed and quality. **All settings** opens the settings page with everything else. Every change applies
+  speed (a slider) and quality. **All settings** opens the settings page with everything else. Every change applies
   immediately, no reload.
 - **Hidden count:** on a page the filters cover, the bottom of the popup shows how many videos were hidden
   and why, so you can check nothing is hidden by mistake.

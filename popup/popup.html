@@ -7,7 +7,6 @@
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
     <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
   </svg>
 
@@ -22,23 +21,25 @@
 
   <main>
     <section>
-      <div class="inline"><span id="lbl-theme">Theme</span>
-        <div class="seg" data-key="theme" role="group" aria-labelledby="lbl-theme">
-          <button data-value="off"><i class="sw" style="--c:#0f0f0f"></i>YouTube</button>
-          <button data-value="black"><i class="sw" style="--c:#000"></i>Black</button>
-          <button data-value="dim"><i class="sw" style="--c:#15202b"></i>Dim</button>
-        </div>
-      </div>
+      <label class="row"><span>Theme</span>
+        <select data-key="theme" class="pick-theme">
+          <option value="off">YouTube</option>
+          <option value="black">Black</option>
+          <option value="midnight">Midnight</option>
+          <option value="ember">Ember</option>
+          <option value="forest">Forest</option>
+        </select>
+      </label>
     </section>
 
     <section aria-labelledby="lbl-hide">
       <h2 class="sec-title" id="lbl-hide">Hide on the home page</h2>
       <div class="chips">
-        <label class="chip"><input type="checkbox" data-key="shorts"><svg aria-hidden="true"><use href="#i-check"/></svg>Shorts</label>
-        <label class="chip"><input type="checkbox" data-key="live"><svg aria-hidden="true"><use href="#i-check"/></svg>Live</label>
-        <label class="chip"><input type="checkbox" data-key="mixes"><svg aria-hidden="true"><use href="#i-check"/></svg>Mixes</label>
-        <label class="chip"><input type="checkbox" data-key="playlists"><svg aria-hidden="true"><use href="#i-check"/></svg>Playlists</label>
-        <label class="chip"><input type="checkbox" data-key="watched"><svg aria-hidden="true"><use href="#i-check"/></svg>Watched</label>
+        <label class="chip"><input type="checkbox" data-key="shorts">Shorts</label>
+        <label class="chip"><input type="checkbox" data-key="live">Live</label>
+        <label class="chip"><input type="checkbox" data-key="mixes">Mixes</label>
+        <label class="chip"><input type="checkbox" data-key="playlists">Playlists</label>
+        <label class="chip"><input type="checkbox" data-key="watched">Watched</label>
       </div>
       <div class="inline"><span id="lbl-members">Members</span>
         <div class="seg" data-key="membersMode" role="group" aria-labelledby="lbl-members">
@@ -49,11 +50,13 @@
 
     <section>
       <label class="row" title="Autoplay skips videos you have watched or played, and videos your filters hide"><span>Smart autoplay</span><span class="tog"><input type="checkbox" data-key="smartAutoplay"><span></span></span></label>
-      <div class="stack"><span id="lbl-speed">Start at speed</span>
-        <div class="seg" data-key="speedValue" data-switch="speed" role="group" aria-labelledby="lbl-speed">
-          <button data-value="off">Off</button><button data-value="1">1</button><button data-value="1.25">1.25</button><button data-value="1.5">1.5</button><button data-value="1.75">1.75</button><button data-value="2">2</button>
-        </div>
-      </div>
+          <div class="rule">
+            <label class="row"><span>Start at speed</span><span class="tog"><input type="checkbox" data-key="speed"><span></span></span></label>
+            <div class="more"><div><div class="slide">
+              <input type="range" min="0.5" max="2" step="0.05" data-key="speedValue" aria-label="Start speed" id="speed-range">
+              <output for="speed-range" data-for="speedValue"></output>
+            </div></div></div>
+          </div>
       <div class="stack"><span id="lbl-quality">Start at quality</span>
         <div class="seg" data-key="qualityValue" data-switch="quality" role="group" aria-labelledby="lbl-quality">
           <button data-value="off">Off</button><button data-value="highest">Best</button><button data-value="2160">4K</button><button data-value="1440">1440</button><button data-value="1080">1080</button><button data-value="720">720</button>

@@ -17,7 +17,7 @@
     {
       "matches": ["*://www.youtube.com/*"],
       "js": ["src/compat.js", "src/parse.js", "src/content.js"],
-      "css": ["src/content.css"],
+      "css": ["src/content.css", "src/themes.css"],
       "run_at": "document_idle"
     },
     {

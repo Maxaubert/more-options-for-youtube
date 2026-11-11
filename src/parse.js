@@ -52,7 +52,7 @@
     hideAccount: false,
     hideChips: false,
     // Look: a theme for YouTube's page and a colour in place of YouTube red, both CSS only.
-    theme: "off", // off | black | dim
+    theme: "off", // off | black | midnight | ember | forest
     accent: false,
     accentColor: "#3ea6ff",
     // Block lists: one entry per line (or comma separated), matched without case
@@ -64,9 +64,9 @@
   const PAGE_PARTS = ["hideSidebar", "hideNavHome", "hideNavShorts", "hideNavSubs", "hideNavYou", "hideLogo",
     "hideSearch", "hideCreate", "hideBell", "hideAccount", "hideChips"];
 
-  const THEMES = ["black", "dim"];
+  const THEMES = ["black", "midnight", "ember", "forest"];
 
-  // The theme and accent for <html>: {theme: "black" | "dim" | "", accent: "#rrggbb" | ""}.
+  // The theme and accent for <html>: {theme: one of THEMES | "", accent: "#rrggbb" | ""}.
   // An unknown theme or a colour that is not #rrggbb gives "", so bad stored values cannot reach the page's CSS.
   function lookFor(settings) {
     const on = !!settings.enabled;
@@ -90,6 +90,7 @@
     "#f1f1f1": "var(--ytf-text)",
     "#aaa": "var(--ytf-text-2)",
     "#aaaaaa": "var(--ytf-text-2)",
+    "#3ea6ff": "var(--ytf-link)", // links and the blue buttons
   };
   function themeVarOverrides(entries) {
     const out = new Map();

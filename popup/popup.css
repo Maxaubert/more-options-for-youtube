@@ -25,14 +25,14 @@ section { margin: 0 4px 6px 12px; padding: 2px 14px; background: var(--panel); b
 .stack { gap: 6px; padding: 6px 0 6px; }
 .row { min-height: 44px; }
 .chips { gap: 6px; padding: 2px 0 10px; }
-.chip { min-height: 34px; padding: 4px 12px 4px 9px; }
+.chip { min-height: 36px; padding: 4px 15px; }
 .sec-title { margin: 6px 0 4px; }
 .inline { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; }
 .inline .seg { flex: 1 1 auto; max-width: 260px; }
-.seg button { white-space: nowrap; }
-.inline .seg button { padding: 6px 4px; }
+.seg button { white-space: nowrap; min-height: 36px; padding: 6px 4px; }
 
 body.off main { opacity: 0.45; }
+.pick-theme { min-width: 160px; font-weight: 600; }
 
 .foot {
   flex: none;
@@ -56,11 +56,11 @@ body.off main { opacity: 0.45; }
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
-  background: var(--panel-2);
-  border: 1px solid var(--edge);
+  background: var(--idle-bg);
+  border: 0;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: background 0.2s var(--ease);
 }
-.all:hover { background: #2a2a30; border-color: var(--muted); }
+.all:hover { background: var(--idle-hover); }
 .all svg { width: 18px; height: 18px; stroke: currentColor; }

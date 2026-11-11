@@ -43,7 +43,7 @@ Works on the home page. Search and Subscriptions stay as YouTube shows them, and
 - Hide parts of the page: the logo, the search bar, the Create button, the bell, your channel icon, the category chips, the sidebar or single sidebar items
 
 **Your look**
-- Themes: Black (pure black for OLED screens) or Dim (a soft dark blue), on top of YouTube's dark theme
+- Dark themes: Black (pure black for OLED screens), Midnight, Ember and Forest
 - Your own accent colour in place of YouTube red: progress bar, watched bars and badges
 
 **Your player, your defaults**

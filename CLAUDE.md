@@ -11,7 +11,7 @@ Firefox/Zen, Chrome/Edge and Safari. Plain JavaScript, no bundler.
 - `src/compat.js`: maps `chrome.*` to `browser.*` in Chrome.
 - `popup/`: `popup.html` (the small popup: most-used switches) and `options.html` (the settings page: every
   setting). Both run `settings.js` and share `ui.css`. Every input has `data-key` = a key in `YTF.DEFAULTS`.
-- Themes: `content.css` sets YouTube's colour variables. YouTube also uses scrambled variable names that change
+- Themes: `src/themes.css` sets YouTube's colour variables. YouTube also uses scrambled variable names that change
   per release; `content.js` finds them by value (`themeVarOverrides` in `parse.js`). Themes need YouTube's dark theme.
 
 ## Commands

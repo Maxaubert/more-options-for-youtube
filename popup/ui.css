@@ -75,36 +75,40 @@ input[type="number"], select {
   border-radius: 8px;
   padding: 5px 10px;
 }
+/* Drop-down lists: no border, like the buttons. */
+select { min-height: 38px; padding: 6px 12px; background: var(--idle-bg); border: 0; border-radius: 9px; cursor: pointer; }
+select:hover { background: var(--idle-hover); }
 input[type="number"] { width: 90px; }
+
+/* Selected = a solid white fill with dark text, the same for every kind of choice. No borders, no marks:
+   the strongest contrast step there is, easy to see with low vision. */
+:root { --pick-bg: #f4f4f5; --pick-text: #0b0b0c; --idle-bg: #26262b; --idle-hover: #303036; }
 
 /* Segmented buttons */
 .stack { display: grid; gap: 8px; padding: 10px 0 12px; }
-.seg { display: flex; gap: 3px; padding: 3px; background: var(--bg); border: 1px solid var(--edge); border-radius: 10px; }
+.seg { display: flex; gap: 4px; }
 .seg button {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 7px 4px;
+  min-height: 38px;
+  padding: 7px 6px;
   font: inherit;
   font-size: 15px;
-  color: var(--muted);
-  background: transparent;
-  border: 0;
-  border-radius: 7px;
-  cursor: pointer;
-}
-.seg button:hover { color: var(--text); }
-.seg button[aria-pressed="true"] {
-  font-weight: 600;
   color: var(--text);
-  background: var(--panel-2);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 -3px 0 var(--accent);
+  background: var(--idle-bg);
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
+.seg button:hover { background: var(--idle-hover); }
+.seg button[aria-pressed="true"] { font-weight: 650; color: var(--pick-text); background: var(--pick-bg); }
 
-/* A colour dot in the theme and accent buttons. */
-.sw { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--edge); background: var(--c); }
+/* A colour dot in the accent buttons. */
+.sw { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
 
 /* Hide chips: one checkbox per thing to hide, drawn as a pill. */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 12px; }
@@ -112,29 +116,47 @@ input[type="number"] { width: 90px; }
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 6px 14px 6px 10px;
+  min-height: 38px;
+  padding: 6px 16px;
   font-size: 16px;
-  color: var(--muted);
-  background: var(--bg);
-  border: 1px solid var(--edge);
+  color: var(--text);
+  background: var(--idle-bg);
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
 .chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.chip svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  opacity: 0.35;
-  transition: opacity 0.2s var(--ease), transform 0.25s var(--ease);
-}
-.chip:hover { color: var(--text); }
-.chip:has(input:checked) { color: var(--text); font-weight: 600; background: var(--accent-soft); border-color: var(--accent); }
-.chip:has(input:checked) svg { opacity: 1; stroke: #ff8589; }
+.chip:hover { background: var(--idle-hover); }
+.chip:has(input:checked) { font-weight: 650; color: var(--pick-text); background: var(--pick-bg); }
 .chip:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Slider (start speed): the value stands next to it in large type. */
+.slide { display: flex; align-items: center; gap: 14px; padding: 2px 0 14px; }
+.slide output { flex: none; min-width: 3.4em; font-size: 18px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+input[type="range"] {
+  flex: 1;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--pick-bg);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: var(--idle-bg); border-radius: 3px; }
+input[type="range"]::-moz-range-track { height: 6px; background: var(--idle-bg); border-radius: 3px; }
+input[type="range"]::-moz-range-progress { height: 6px; background: var(--pick-bg); border-radius: 3px; }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -9px;
+  background: #fff;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
 
 /* Block */
 .field { display: grid; gap: 8px; padding: 10px 0 12px; }

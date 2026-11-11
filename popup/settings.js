@@ -71,8 +71,9 @@
   // --- Inputs ---------------------------------------------------------------------------------
   // A number box keeps to its min and max (the browser does not enforce them outside a form).
   // An empty or broken value falls back to the saved one.
+  // A checkbox with data-on / data-off stores those values in place of true / false (the Black theme switch).
   function read(el) {
-    if (el.type === "checkbox") return el.checked;
+    if (el.type === "checkbox") return "on" in el.dataset ? (el.checked ? el.dataset.on : el.dataset.off) : el.checked;
     if (el.type === "number") {
       const n = Number(el.value);
       if (el.value === "" || !Number.isFinite(n)) return settings[el.dataset.key];
@@ -86,14 +87,22 @@
   const inputs = [...document.querySelectorAll("input[data-key], select[data-key], textarea[data-key]")];
   function paintInput(el) {
     const v = settings[el.dataset.key];
-    if (el.type === "checkbox") el.checked = v;
+    if (el.type === "checkbox") el.checked = "on" in el.dataset ? v === el.dataset.on : v;
     else if (el.value !== String(v)) el.value = v;
+    if (el.type === "range") showValue(el);
     if (el.tagName === "TEXTAREA") fit(el);
     if (el.dataset.key === "blockWords") readBack(el);
   }
 
+  // A slider shows its value next to it, as "1.25×".
+  function showValue(el) {
+    const out = document.querySelector(`output[data-for="${el.dataset.key}"]`);
+    if (out) out.textContent = Number(el.value) + "×";
+  }
+
   for (const el of inputs) {
     paintInput(el);
+    if (el.type === "range") el.addEventListener("input", () => showValue(el));
     if (el.tagName === "TEXTAREA") el.addEventListener("input", () => fit(el));
     if (el.dataset.key === "blockWords") el.addEventListener("input", () => readBack(el));
     el.addEventListener("change", () => {
@@ -101,8 +110,8 @@
       if (el.type === "number") el.value = v; // show the clamped value
       save({ [el.dataset.key]: v });
     });
-    // Typed text and a dragged colour are saved while they change too: the popup can close before "change" fires.
-    if (el.tagName === "TEXTAREA" || el.type === "number" || el.type === "color") {
+    // Typed text, a dragged colour or slider are saved while they change too: the popup can close before "change" fires.
+    if (el.tagName === "TEXTAREA" || el.type === "number" || el.type === "color" || el.type === "range") {
       let t = 0;
       el.addEventListener("input", () => {
         clearTimeout(t);
