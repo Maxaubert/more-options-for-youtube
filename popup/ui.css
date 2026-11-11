@@ -1,0 +1,171 @@
+/* Shared by the popup and the settings page. Large type and strong contrast on purpose: the owner has low vision. */
+:root {
+  --bg: #0b0b0c;
+  --panel: #161618;
+  --panel-2: #1f1f23;
+  --line: #2c2c31;
+  --edge: #767680; /* control borders and the off switch: at least 3:1 on the panel */
+  --text: #f4f4f5;
+  --muted: #b4b4bd;
+  --accent: #e5484d;
+  --accent-soft: rgba(229, 72, 77, 0.16);
+  --show: #4cc38a;
+  --show-soft: rgba(76, 195, 138, 0.15);
+  --warn: #f5b942;
+  --warn-soft: rgba(245, 185, 66, 0.12);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+::selection { background: var(--accent); color: #fff; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 18px/1.35 system-ui, "Segoe UI", sans-serif;
+}
+
+.sec-title { margin: 8px 0 2px; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); }
+
+/* Rows */
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; }
+.row > span:first-child { flex: 1; }
+:is(.row, .rule, .stack, .field, .note) + :is(.row, .rule, .stack, .field, .note) { border-top: 1px solid var(--line); }
+
+/* Toggle switches */
+.tog { position: relative; width: 46px; height: 28px; flex: none; }
+.tog input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.tog span { position: absolute; inset: 0; border-radius: 999px; background: var(--edge); transition: background 0.2s var(--ease); }
+.tog span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s var(--ease);
+}
+.tog input:checked + span { background: var(--accent); }
+.tog input:checked + span::after { transform: translateX(18px); }
+.tog input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+.tog.big { width: 56px; height: 32px; }
+.tog.big span::after { width: 26px; height: 26px; }
+.tog.big input:checked + span::after { transform: translateX(24px); }
+
+/* Rules: the value boxes open only while the rule is on */
+.more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s var(--ease); }
+.more > div { overflow: hidden; }
+.rule:has(.tog input:checked) .more { grid-template-rows: 1fr; }
+/* Closed rules are also out of the Tab order and hidden from screen readers. */
+.rule:not(:has(.tog input:checked)) .more > div { visibility: hidden; transition: visibility 0s 0.3s; }
+.sentence { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 0 12px; font-size: 16px; color: var(--muted); }
+
+input[type="number"], select {
+  font: inherit;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+input[type="number"] { width: 90px; }
+
+/* Segmented buttons */
+.stack { display: grid; gap: 8px; padding: 10px 0 12px; }
+.seg { display: flex; gap: 3px; padding: 3px; background: var(--bg); border: 1px solid var(--edge); border-radius: 10px; }
+.seg button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 4px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] {
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel-2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 -3px 0 var(--accent);
+}
+
+/* A colour dot in the theme and accent buttons. */
+.sw { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--edge); background: var(--c); }
+
+/* Hide chips: one checkbox per thing to hide, drawn as a pill. */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 12px; }
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 14px 6px 10px;
+  font-size: 16px;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.chip svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0.35;
+  transition: opacity 0.2s var(--ease), transform 0.25s var(--ease);
+}
+.chip:hover { color: var(--text); }
+.chip:has(input:checked) { color: var(--text); font-weight: 600; background: var(--accent-soft); border-color: var(--accent); }
+.chip:has(input:checked) svg { opacity: 1; stroke: #ff8589; }
+.chip:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Block */
+.field { display: grid; gap: 8px; padding: 10px 0 12px; }
+textarea {
+  width: 100%;
+  padding: 9px 11px;
+  font: 16px/1.5 system-ui, "Segoe UI", sans-serif;
+  color: var(--text);
+  caret-color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  resize: none;
+  overflow: hidden; /* settings.js grows the box to fit its text */
+}
+textarea::placeholder { color: #8e8e98; }
+textarea[aria-invalid="true"] { border-color: var(--warn); }
+
+.readback { display: grid; gap: 6px; }
+.readback:empty { display: none; }
+.rl { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px; }
+.rl .who { font-weight: 600; white-space: nowrap; }
+.rl .what { overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.tag { flex: none; padding: 2px 7px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 6px; }
+.tag.show { color: var(--show); background: var(--show-soft); }
+.tag.hide { color: #ff8589; background: var(--accent-soft); }
+.warnbox { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; font-size: 15px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; }
+.warnbox svg { flex: none; width: 18px; height: 18px; margin-top: 1px; stroke: var(--warn); }
+
+:is(input, select, textarea, button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

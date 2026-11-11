@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.6.0](https://img.shields.io/badge/version-0.6.0-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.7.0](https://img.shields.io/badge/version-0.7.0-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
   [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
@@ -23,7 +23,7 @@ for YouTube gives each of those a switch. Everything runs in your browser, with 
 sent anywhere.
 
 <p align="center">
-  <img src="docs/store/screenshot-1.png" alt="The popup, Hide tab" width="640">
+  <img src="docs/store/screenshot-1.png" alt="The popup" width="640">
 </p>
 
 ## Features
@@ -47,6 +47,10 @@ sent anywhere.
 - Hide parts of the page, one switch each: the YouTube logo, the search bar, the Create button, the
   notification bell, your channel icon, the category chips, the whole sidebar, or single sidebar items
   (Home, Shorts, Subscriptions, You).
+
+**Your look**
+- Themes: Black (pure black for OLED screens) or Dim (a soft dark blue). They build on YouTube's dark theme.
+- Your own accent colour in place of YouTube red: the progress bar, the watched bar on thumbnails, badges.
 
 **Your player, your defaults**
 - Autoplay that skips videos you have already watched or played, so it stops looping.
@@ -80,12 +84,14 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 
 ## Usage
 
-- **Settings:** click the toolbar icon. Settings sit in four tabs: Hide, Layout, Player and Block. Every change applies immediately, no reload.
+- **Settings:** click the toolbar icon. The popup holds the switches you use most: theme, what to hide, autoplay,
+  speed and quality. **All settings** opens the settings page with everything else. Every change applies
+  immediately, no reload.
 - **Hidden count:** on a page the filters cover, the bottom of the popup shows how many videos were hidden
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
-  Block tab (one per line). Remove a line to unblock.
-- **Filter out:** the Filter out field in the Block tab takes one rule per line. Case does not matter.
+  Block section of the settings page (one per line). Remove a line to unblock.
+- **Filter out:** the Filter out field on the settings page takes one rule per line. Case does not matter.
   - `@channel show "before you buy"` shows only the videos from that channel with those words in the title.
   - `@channel hide "top 10"` hides the videos from that channel with those words in the title.
   - Several words in quotes on one line match any of them: `@channel hide "top 10" "ranked"`.

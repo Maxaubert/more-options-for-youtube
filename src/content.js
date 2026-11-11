@@ -161,6 +161,39 @@
     }
   }
 
+  // YouTube's colour variables with scrambled names (see Y.themeVarOverrides): read from its style sheets
+  // and mapped to the theme's colours in one <style>. Read again only when YouTube adds a style sheet.
+  let themeSheets = -1;
+  function themeVars() {
+    const count = document.styleSheets.length;
+    if (count === themeSheets) return;
+    themeSheets = count;
+    const entries = [];
+    const walk = (rules) => {
+      for (const r of rules) {
+        if (r.cssRules && !r.style) walk(r.cssRules);
+        else if (r.style && /^(:root|\[dark\])$/.test(r.selectorText)) {
+          for (const name of r.style) if (name.startsWith("--")) entries.push([name, r.style.getPropertyValue(name)]);
+        }
+      }
+    };
+    for (const sheet of document.styleSheets) {
+      try {
+        walk(sheet.cssRules);
+      } catch {
+        // a style sheet from another site: not readable, and not YouTube's colours
+      }
+    }
+    const lines = Y.themeVarOverrides(entries);
+    let style = document.getElementById("ytf-theme-vars");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "ytf-theme-vars";
+      (document.head || ROOT).append(style);
+    }
+    style.textContent = `html[dark][data-ytf-theme], html[dark][data-ytf-theme] [dark] {\n  ${lines.join("\n  ")}\n}`;
+  }
+
   // CSS switches on <html> (content.css reads them) and the settings for main.js.
   function applySwitches() {
     const on = settings.enabled;
@@ -178,6 +211,18 @@
     for (const [name, value] of Object.entries(flags)) {
       if (value && !ROOT.hasAttribute(name)) ROOT.setAttribute(name, "");
       if (!value && ROOT.hasAttribute(name)) ROOT.removeAttribute(name);
+    }
+    const look = Y.lookFor(settings);
+    if ((ROOT.getAttribute("data-ytf-theme") || "") !== look.theme) {
+      if (look.theme) ROOT.setAttribute("data-ytf-theme", look.theme);
+      else ROOT.removeAttribute("data-ytf-theme");
+    }
+    if (look.theme) themeVars();
+    if (look.accent && !ROOT.hasAttribute("data-ytf-accent")) ROOT.setAttribute("data-ytf-accent", "");
+    if (!look.accent && ROOT.hasAttribute("data-ytf-accent")) ROOT.removeAttribute("data-ytf-accent");
+    if (ROOT.style.getPropertyValue("--ytf-accent") !== look.accent) {
+      if (look.accent) ROOT.style.setProperty("--ytf-accent", look.accent);
+      else ROOT.style.removeProperty("--ytf-accent");
     }
     const perRow = String(Math.min(8, Math.max(1, Number(settings.perRowValue) || 3)));
     if (ROOT.style.getPropertyValue("--ytf-per-row") !== perRow) ROOT.style.setProperty("--ytf-per-row", perRow);
