@@ -109,6 +109,17 @@ html[dark][data-ytf-theme] :where(ytd-masthead #background, #masthead-container,
   tp-yt-app-drawer #contentContainer, ytd-guide-renderer, #chips-wrapper.ytd-feed-filter-chip-bar-renderer) {
   background: var(--ytf-bg) !important;
 }
+/* Around the player: no ambient-mode glow (it paints a blurred copy of the video, which reads as grey
+   bars beside it), the theater area in the theme colour, and the player's own menus in the theme too. */
+html[dark][data-ytf-theme] :is(#cinematics, #cinematics-container, #cinematics-full-bleed-container) {
+  display: none !important;
+}
+html[dark][data-ytf-theme] ytd-watch-flexy :is(#full-bleed-container, #player-full-bleed-container, #player-theater-container) {
+  background: var(--ytf-bg) !important;
+}
+html[dark][data-ytf-theme] #movie_player :is(.ytp-popup, .ytp-settings-menu, .ytp-panel-menu) {
+  background: rgba(var(--ytf-bg-rgb), 0.94) !important;
+}
 html[dark][data-ytf-theme] :where([class*="ytSearchboxComponentInputBox"]) {
   background: var(--ytf-surface) !important;
 }
