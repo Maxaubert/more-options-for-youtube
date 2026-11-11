@@ -1,0 +1,193 @@
+/* Shared by the popup and the settings page. Large type and strong contrast on purpose: the owner has low vision. */
+:root {
+  --bg: #0b0b0c;
+  --panel: #161618;
+  --panel-2: #1f1f23;
+  --line: #2c2c31;
+  --edge: #767680; /* control borders and the off switch: at least 3:1 on the panel */
+  --text: #f4f4f5;
+  --muted: #b4b4bd;
+  --accent: #e5484d;
+  --accent-soft: rgba(229, 72, 77, 0.16);
+  --show: #4cc38a;
+  --show-soft: rgba(76, 195, 138, 0.15);
+  --warn: #f5b942;
+  --warn-soft: rgba(245, 185, 66, 0.12);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+::selection { background: var(--accent); color: #fff; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 18px/1.35 system-ui, "Segoe UI", sans-serif;
+}
+
+.sec-title { margin: 8px 0 2px; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); }
+
+/* Rows */
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; }
+.row > span:first-child { flex: 1; }
+:is(.row, .rule, .stack, .field, .note) + :is(.row, .rule, .stack, .field, .note) { border-top: 1px solid var(--line); }
+
+/* Toggle switches */
+.tog { position: relative; width: 46px; height: 28px; flex: none; }
+.tog input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.tog span { position: absolute; inset: 0; border-radius: 999px; background: var(--edge); transition: background 0.2s var(--ease); }
+.tog span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s var(--ease);
+}
+.tog input:checked + span { background: var(--accent); }
+.tog input:checked + span::after { transform: translateX(18px); }
+.tog input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+.tog.big { width: 56px; height: 32px; }
+.tog.big span::after { width: 26px; height: 26px; }
+.tog.big input:checked + span::after { transform: translateX(24px); }
+
+/* Rules: the value boxes open only while the rule is on */
+.more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s var(--ease); }
+.more > div { overflow: hidden; }
+.rule:has(.tog input:checked) .more { grid-template-rows: 1fr; }
+/* Closed rules are also out of the Tab order and hidden from screen readers. */
+.rule:not(:has(.tog input:checked)) .more > div { visibility: hidden; transition: visibility 0s 0.3s; }
+.sentence { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 0 12px; font-size: 16px; color: var(--muted); }
+
+input[type="number"], select {
+  font: inherit;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+/* Drop-down lists: no border, like the buttons. */
+select { min-height: 38px; padding: 6px 12px; background: var(--idle-bg); border: 0; border-radius: 9px; cursor: pointer; }
+select:hover { background: var(--idle-hover); }
+input[type="number"] { width: 90px; }
+
+/* Selected = a solid white fill with dark text, the same for every kind of choice. No borders, no marks:
+   the strongest contrast step there is, easy to see with low vision. */
+:root { --pick-bg: #f4f4f5; --pick-text: #0b0b0c; --idle-bg: #26262b; --idle-hover: #303036; }
+
+/* Segmented buttons */
+.stack { display: grid; gap: 8px; padding: 10px 0 12px; }
+.seg { display: flex; gap: 4px; }
+.seg button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 6px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--idle-bg);
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+.seg button:hover { background: var(--idle-hover); }
+.seg button[aria-pressed="true"] { font-weight: 650; color: var(--pick-text); background: var(--pick-bg); }
+
+/* A colour dot in the accent buttons. */
+.sw { flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25); }
+
+/* Hide chips: one checkbox per thing to hide, drawn as a pill. */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 12px; }
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 6px 16px;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--idle-bg);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+.chip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.chip:hover { background: var(--idle-hover); }
+.chip:has(input:checked) { font-weight: 650; color: var(--pick-text); background: var(--pick-bg); }
+.chip:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Slider (start speed): the value stands next to it in large type. */
+.slide { display: flex; align-items: center; gap: 14px; padding: 2px 0 14px; }
+.slide output { flex: none; min-width: 3.4em; font-size: 18px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+input[type="range"] {
+  flex: 1;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  accent-color: var(--pick-bg);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: var(--idle-bg); border-radius: 3px; }
+input[type="range"]::-moz-range-track { height: 6px; background: var(--idle-bg); border-radius: 3px; }
+input[type="range"]::-moz-range-progress { height: 6px; background: var(--pick-bg); border-radius: 3px; }
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -9px;
+  background: #fff;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+
+/* Block */
+.field { display: grid; gap: 8px; padding: 10px 0 12px; }
+textarea {
+  width: 100%;
+  padding: 9px 11px;
+  font: 16px/1.5 system-ui, "Segoe UI", sans-serif;
+  color: var(--text);
+  caret-color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  resize: none;
+  overflow: hidden; /* settings.js grows the box to fit its text */
+}
+textarea::placeholder { color: #8e8e98; }
+textarea[aria-invalid="true"] { border-color: var(--warn); }
+
+.readback { display: grid; gap: 6px; }
+.readback:empty { display: none; }
+.rl { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px; }
+.rl .who { font-weight: 600; white-space: nowrap; }
+.rl .what { overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.tag { flex: none; padding: 2px 7px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 6px; }
+.tag.show { color: var(--show); background: var(--show-soft); }
+.tag.hide { color: #ff8589; background: var(--accent-soft); }
+.warnbox { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; font-size: 15px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; }
+.warnbox svg { flex: none; width: 18px; height: 18px; margin-top: 1px; stroke: var(--warn); }
+
+:is(input, select, textarea, button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

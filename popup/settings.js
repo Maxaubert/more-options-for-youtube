@@ -1,5 +1,7 @@
-// Settings popup. Inputs and segmented button groups carry data-key matching a key in YTF.DEFAULTS and save on change.
-// A group with data-switch also drives an on/off key: its "off" button turns that key off (speed, quality, per row).
+// Settings for the popup (popup.html) and the settings page (options.html). Inputs and segmented button groups
+// carry data-key matching a key in YTF.DEFAULTS and save on change. A group with data-switch also drives an
+// on/off key: its "off" button turns that key off (speed, quality, per row). A change made in one window
+// shows up in the other right away.
 (async function () {
   "use strict";
   const Y = globalThis.YTF;
@@ -10,39 +12,13 @@
     await browser.storage.local.set(moved);
   }
 
+  const stats = document.getElementById("stats");
   const save = async (patch) => {
     Object.assign(settings, patch);
     await browser.storage.local.set(patch);
     document.body.classList.toggle("off", !settings.enabled);
-    setTimeout(showStats, 300);
+    if (stats) setTimeout(showStats, 300);
   };
-
-  // --- Tabs (the last one used is remembered on this computer) -------------------------------
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
-  function selectTab(tab) {
-    for (const t of tabs) {
-      t.setAttribute("aria-selected", String(t === tab));
-      t.tabIndex = t === tab ? 0 : -1;
-      document.getElementById(t.getAttribute("aria-controls")).hidden = t !== tab;
-    }
-    document.querySelector(".panes").scrollTop = 0;
-    document.querySelectorAll("textarea").forEach(fit); // boxes in a hidden tab had no size yet
-    try {
-      localStorage.setItem("ytf-tab", tab.id);
-    } catch {
-      // storage blocked: the popup just opens on the first tab
-    }
-  }
-  for (const t of tabs) {
-    t.addEventListener("click", () => selectTab(t));
-    t.addEventListener("keydown", (e) => {
-      const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-      if (!step) return;
-      const next = tabs[(tabs.indexOf(t) + step + tabs.length) % tabs.length];
-      selectTab(next);
-      next.focus();
-    });
-  }
 
   // --- Text boxes grow with their text --------------------------------------------------------
   function fit(el) {
@@ -95,8 +71,9 @@
   // --- Inputs ---------------------------------------------------------------------------------
   // A number box keeps to its min and max (the browser does not enforce them outside a form).
   // An empty or broken value falls back to the saved one.
+  // A checkbox with data-on / data-off stores those values in place of true / false (the Black theme switch).
   function read(el) {
-    if (el.type === "checkbox") return el.checked;
+    if (el.type === "checkbox") return "on" in el.dataset ? (el.checked ? el.dataset.on : el.dataset.off) : el.checked;
     if (el.type === "number") {
       const n = Number(el.value);
       if (el.value === "" || !Number.isFinite(n)) return settings[el.dataset.key];
@@ -107,22 +84,34 @@
     return el.value;
   }
 
-  for (const el of document.querySelectorAll("input[data-key], select[data-key], textarea[data-key]")) {
+  const inputs = [...document.querySelectorAll("input[data-key], select[data-key], textarea[data-key]")];
+  function paintInput(el) {
     const v = settings[el.dataset.key];
-    if (el.type === "checkbox") el.checked = v;
-    else el.value = v;
+    if (el.type === "checkbox") el.checked = "on" in el.dataset ? v === el.dataset.on : v;
+    else if (el.value !== String(v)) el.value = v;
+    if (el.type === "range") showValue(el);
+    if (el.tagName === "TEXTAREA") fit(el);
+    if (el.dataset.key === "blockWords") readBack(el);
+  }
+
+  // A slider shows its value next to it, as "1.25×".
+  function showValue(el) {
+    const out = document.querySelector(`output[data-for="${el.dataset.key}"]`);
+    if (out) out.textContent = Number(el.value) + "×";
+  }
+
+  for (const el of inputs) {
+    paintInput(el);
+    if (el.type === "range") el.addEventListener("input", () => showValue(el));
     if (el.tagName === "TEXTAREA") el.addEventListener("input", () => fit(el));
-    if (el.dataset.key === "blockWords") {
-      readBack(el);
-      el.addEventListener("input", () => readBack(el));
-    }
+    if (el.dataset.key === "blockWords") el.addEventListener("input", () => readBack(el));
     el.addEventListener("change", () => {
       const v = read(el);
       if (el.type === "number") el.value = v; // show the clamped value
       save({ [el.dataset.key]: v });
     });
-    // Typed text is saved while typing too: the popup can close before "change" fires.
-    if (el.tagName === "TEXTAREA" || el.type === "number") {
+    // Typed text, a dragged colour or slider are saved while they change too: the popup can close before "change" fires.
+    if (el.tagName === "TEXTAREA" || el.type === "number" || el.type === "color" || el.type === "range") {
       let t = 0;
       el.addEventListener("input", () => {
         clearTimeout(t);
@@ -135,36 +124,78 @@
   }
 
   // --- Segmented button groups ----------------------------------------------------------------
+  const segPainters = [];
   for (const seg of document.querySelectorAll(".seg[data-key]")) {
     const { key, switch: onKey } = seg.dataset;
     const buttons = [...seg.querySelectorAll("button")];
     const current = () => (onKey && !settings[onKey] ? "off" : String(settings[key]));
     const paint = () => buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === current())));
     paint();
+    segPainters.push(paint);
     seg.addEventListener("click", async (e) => {
       const b = e.target.closest("button");
       if (!b) return;
       const value = b.dataset.value;
       const patch = {};
       if (onKey) patch[onKey] = value !== "off";
-      if (value !== "off") patch[key] = "number" in seg.dataset ? Number(value) : value;
+      if (value !== "off" || !onKey) patch[key] = "number" in seg.dataset ? Number(value) : value;
       await save(patch);
-      paint();
+      paintAll();
     });
   }
 
-  document.body.classList.toggle("off", !settings.enabled);
-  let saved = null;
-  try {
-    saved = localStorage.getItem("ytf-tab");
-  } catch {
-    // storage blocked
+  function paintAll() {
+    for (const el of inputs) if (el !== document.activeElement) paintInput(el);
+    segPainters.forEach((paint) => paint());
+    document.body.classList.toggle("off", !settings.enabled);
   }
-  selectTab(document.getElementById(saved) || tabs[0]);
 
-  // --- Hidden count ---------------------------------------------------------------------------
+  // The other window (popup or settings page) changed something: show it here.
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local") return;
+    let mine = false;
+    for (const [key, { newValue }] of Object.entries(changes)) {
+      if (!(key in Y.DEFAULTS)) continue;
+      settings[key] = newValue === undefined ? Y.DEFAULTS[key] : newValue;
+      mine = true;
+    }
+    if (mine) paintAll();
+  });
+
+  document.body.classList.toggle("off", !settings.enabled);
+
+  // --- Popup: All settings opens the settings page in a tab -----------------------------------
+  const openAll = document.getElementById("open-settings");
+  if (openAll) {
+    openAll.addEventListener("click", async () => {
+      await browser.runtime.openOptionsPage();
+      window.close();
+    });
+  }
+
+  // --- Settings page: the section list marks the section in view ------------------------------
+  const links = [...document.querySelectorAll(".toc a")];
+  if (links.length) {
+    const byId = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+    const mark = (id) => links.forEach((a) => a.setAttribute("aria-current", String(a === byId.get(id))));
+    const seen = new Map();
+    const watch = new IntersectionObserver((entries) => {
+      for (const e of entries) seen.set(e.target.id, e.isIntersecting);
+      const first = [...byId.keys()].find((id) => seen.get(id));
+      if (first) mark(first);
+    }, { rootMargin: "-10% 0px -60% 0px" });
+    for (const id of byId.keys()) watch.observe(document.getElementById(id));
+    // A short last section never reaches the band above: at the bottom of the page, mark it.
+    const last = links[links.length - 1].getAttribute("href").slice(1);
+    addEventListener("scroll", () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) mark(last);
+    }, { passive: true });
+    for (const a of links) a.addEventListener("click", () => setTimeout(() => mark(a.getAttribute("href").slice(1)), 600));
+    mark(links[0].getAttribute("href").slice(1));
+  }
+
+  // --- Popup: hidden count --------------------------------------------------------------------
   async function showStats() {
-    const footer = document.getElementById("stats");
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     let res = null;
     try {
@@ -172,14 +203,14 @@
     } catch {
       // Not a YouTube tab: no content script to answer.
     }
-    // The count only makes sense on a page the filters work on; elsewhere the footer stays hidden.
-    footer.hidden = !res || !res.active;
-    if (footer.hidden) return;
+    // The count only makes sense on a page the filters work on; elsewhere it stays hidden.
+    stats.hidden = !res || !res.active;
+    if (stats.hidden) return;
     const parts = Object.entries(res.counts).sort((a, b) => b[1] - a[1]);
     const total = parts.reduce((sum, [, n]) => sum + n, 0);
-    footer.replaceChildren(make("b", "", String(total)), " hidden on this page");
-    footer.title = parts.map(([k, n]) => `${Y.REASONS[k]}: ${n}`).join("\n");
+    stats.replaceChildren(make("b", "", String(total)), " hidden on this page");
+    stats.title = parts.map(([k, n]) => `${Y.REASONS[k]}: ${n}`).join("\n");
   }
 
-  showStats();
+  if (stats) showStats();
 })();

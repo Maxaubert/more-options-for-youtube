@@ -21,7 +21,7 @@ Mozilla does not want a name that starts with someone else's brand. "… for You
 ## Summary (max 250 characters on AMO, 132 on Chrome)
 
 The manifest `description` is the summary on both stores:
-Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, and set your player defaults.
+Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, set player defaults, and theme YouTube.
 
 ## Description
 
@@ -42,13 +42,17 @@ Works on the home page. Search and Subscriptions stay as YouTube shows them, and
 - No more videos playing when you hover over a thumbnail
 - Hide parts of the page: the logo, the search bar, the Create button, the bell, your channel icon, the category chips, the sidebar or single sidebar items
 
+**Your look**
+- Dark themes: Black (pure black for OLED screens), Midnight, Ember and Forest
+- Your own accent colour in place of YouTube red: progress bar, watched bars and badges
+
 **Your player, your defaults**
 - Autoplay that skips videos you have already watched or played, and never plays a video your filters hide
 - Start every video at your speed, quality and in theater mode
 - Subtitles always off, or always in Norwegian or English (auto-translated when needed)
 - Open Shorts in the normal player, hide end cards, hide comments
 
-Everything sits in four tabs in the toolbar popup, in large, clear type, and changes apply instantly.
+The toolbar popup holds the switches you use most. All settings sit on one settings page. Large, clear type, and changes apply instantly.
 Reads YouTube in English and Norwegian.
 
 **Privacy:** no data leaves your browser. No accounts, no tracking, no analytics. Settings are stored
@@ -71,7 +75,7 @@ Bug reports and ideas are welcome there.
 | Support | The GitHub link in the description |
 | Source code | Not needed. The code is not minified or bundled. |
 | Contributions URL | https://ko-fi.com/maxaubert |
-| Screenshots | `docs/store/screenshot-1.png` to `-3.png` (1280 x 800, the tabbed popup) |
+| Screenshots | `docs/store/screenshot-1.png` to `-3.png` (1280 x 800: the popup, the settings page, page parts) |
 
 ## To do on AMO (Max, in the Developer Hub)
 

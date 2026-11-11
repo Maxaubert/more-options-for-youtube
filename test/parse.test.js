@@ -295,3 +295,35 @@ test("shelves", () => {
   assert.equal(Y.decideShelf({ shorts: false, playables: false, title: "Recommended" }, S), null);
   assert.equal(Y.decideShelf({ shorts: true, playables: false, title: "" }, { ...S, enabled: false }), null);
 });
+
+test("theme and accent colour for the page", () => {
+  const on = { ...Y.DEFAULTS };
+  assert.deepEqual(Y.lookFor(on), { theme: "", accent: "" });
+  assert.deepEqual(Y.lookFor({ ...on, theme: "black" }), { theme: "black", accent: "" });
+  assert.deepEqual(Y.lookFor({ ...on, theme: "black", accent: true, accentColor: "#3EA6FF" }), { theme: "black", accent: "#3ea6ff" });
+  assert.equal(Y.lookFor({ ...on, theme: "dim" }).theme, ""); // Dim was dropped before release
+  // Unknown or broken values never reach the CSS.
+  assert.deepEqual(Y.lookFor({ ...on, theme: "neon", accent: true, accentColor: "red;}" }), { theme: "", accent: "" });
+  // The main switch off: YouTube looks as normal.
+  assert.deepEqual(Y.lookFor({ ...on, enabled: false, theme: "black", accent: true }), { theme: "", accent: "" });
+});
+
+test("theme finds YouTube's scrambled colour variables by value", () => {
+  const out = Y.themeVarOverrides([
+    ["--tffc2fd3a644f6275", "#f1f1f1"],
+    ["--t0123456789abcdef", " #0F0F0F "],
+    ["--t1111111111111111", "rgba(15,15,15,0.8)"],
+    ["--yt-spec-raised-background", "#212121"],
+    ["--t2222222222222222", "#123456"], // not a palette colour: left alone
+    ["--other", "#0f0f0f"], // not a YouTube colour variable
+    ["--t0123456789abcdef", "#0f0f0f"], // twice: one line
+    ["--t3333333333333333", "#0f0f0f"], // a :root value ...
+    ["--t3333333333333333", "#fff"], // ... that [dark] changes to a colour outside the palette: left alone
+  ]);
+  assert.deepEqual(out, [
+    "--tffc2fd3a644f6275: var(--ytf-text) !important;",
+    "--t1111111111111111: rgba(var(--ytf-bg-rgb), 0.8) !important;",
+    "--yt-spec-raised-background: var(--ytf-raised) !important;",
+    "--t0123456789abcdef: var(--ytf-bg) !important;",
+  ]);
+});

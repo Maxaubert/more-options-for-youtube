@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "More Options for YouTube",
-  "version": "0.6.0",
-  "description": "Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, and set your player defaults.",
+  "version": "0.7.0",
+  "description": "Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, set player defaults, and theme YouTube.",
   "browser_specific_settings": {
     "gecko": {
       "id": "yt-filter@loftspace",
@@ -17,7 +17,7 @@
     {
       "matches": ["*://www.youtube.com/*"],
       "js": ["src/compat.js", "src/parse.js", "src/content.js"],
-      "css": ["src/content.css"],
+      "css": ["src/content.css", "src/themes.css"],
       "run_at": "document_idle"
     },
     {
@@ -31,5 +31,9 @@
     "default_title": "More Options for YouTube",
     "default_popup": "popup/popup.html",
     "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png" }
+  },
+  "options_ui": {
+    "page": "popup/options.html",
+    "open_in_tab": true
   }
 }

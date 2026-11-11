@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>More Options for YouTube: settings</title>
+  <link rel="icon" href="../icons/icon-32.png">
+  <link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+  </svg>
+
+  <header class="top">
+    <img src="../icons/icon-128.png" alt="" width="40" height="40">
+    <h1>More Options for YouTube</h1>
+    <label class="master">
+      <span>All filters</span>
+      <span class="tog big"><input type="checkbox" data-key="enabled" aria-label="All filters"><span></span></span>
+    </label>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Sections">
+      <a href="#look">Look</a>
+      <a href="#hide">Hide</a>
+      <a href="#limits">Limits</a>
+      <a href="#grid">Grid</a>
+      <a href="#parts">Page parts</a>
+      <a href="#player">Player</a>
+      <a href="#block">Block</a>
+    </nav>
+
+    <main>
+      <section id="look" aria-labelledby="h-look">
+        <h2 id="h-look">Look</h2>
+        <div class="panel">
+          <div class="stack"><span id="lbl-theme">Theme</span>
+            <div class="seg themes" data-key="theme" role="group" aria-labelledby="lbl-theme">
+              <button data-value="off" class="tc" style="--tc-bg:#0f0f0f;--tc-raised:#272727;--tc-acc:#ff0033;--tc-text:#f1f1f1"><span class="tc-view" aria-hidden="true"><i class="tc-thumb"></i><i class="tc-line"></i><i class="tc-line short"></i></span><span class="tc-name">YouTube</span></button>
+              <button data-value="black" class="tc" style="--tc-bg:#000;--tc-raised:#161616;--tc-acc:#ff0033;--tc-text:#f1f1f1"><span class="tc-view" aria-hidden="true"><i class="tc-thumb"></i><i class="tc-line"></i><i class="tc-line short"></i></span><span class="tc-name">Black</span></button>
+              <button data-value="midnight" class="tc f-mid" style="--tc-bg:#060a18;--tc-raised:#162241;--tc-acc:#7c9cff;--tc-text:#eef2ff"><span class="tc-view" aria-hidden="true"><i class="tc-thumb"></i><i class="tc-line"></i><i class="tc-line short"></i></span><span class="tc-name">Midnight</span></button>
+              <button data-value="ember" class="tc" style="--tc-bg:#120c09;--tc-raised:#2b1e16;--tc-acc:#ff8a3d;--tc-text:#fff4eb"><span class="tc-view" aria-hidden="true"><i class="tc-thumb"></i><i class="tc-line"></i><i class="tc-line short"></i></span><span class="tc-name">Ember</span></button>
+              <button data-value="forest" class="tc" style="--tc-bg:#08110d;--tc-raised:#182b22;--tc-acc:#4fe0a8;--tc-text:#effbf5"><span class="tc-view" aria-hidden="true"><i class="tc-thumb"></i><i class="tc-line"></i><i class="tc-line short"></i></span><span class="tc-name">Forest</span></button>
+            </div>
+            <p class="hint">All themes are dark and build on YouTube's dark theme. If YouTube is light, turn on Dark in
+              YouTube first: your channel icon, then Appearance.</p>
+          </div>
+          <div class="rule">
+            <label class="row"><span>Own accent colour (in place of YouTube red or the theme's colour)</span><span class="tog"><input type="checkbox" data-key="accent"><span></span></span></label>
+            <div class="more"><div>
+              <div class="accents">
+                <div class="seg swatches" data-key="accentColor" role="group" aria-label="Accent colour">
+                  <button data-value="#3ea6ff" aria-label="Blue"><i class="sw" style="--c:#3ea6ff"></i></button>
+                  <button data-value="#2ecc71" aria-label="Green"><i class="sw" style="--c:#2ecc71"></i></button>
+                  <button data-value="#a970ff" aria-label="Purple"><i class="sw" style="--c:#a970ff"></i></button>
+                  <button data-value="#ff9f1a" aria-label="Orange"><i class="sw" style="--c:#ff9f1a"></i></button>
+                  <button data-value="#ff5fa2" aria-label="Pink"><i class="sw" style="--c:#ff5fa2"></i></button>
+                  <button data-value="#f4f4f5" aria-label="White"><i class="sw" style="--c:#f4f4f5"></i></button>
+                </div>
+                <label class="pick"><span>Other</span><input type="color" data-key="accentColor"></label>
+              </div>
+              <p class="hint">Used for the progress bar, the watched bar on thumbnails and the red badges.</p>
+            </div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="hide" aria-labelledby="h-hide">
+        <h2 id="h-hide">Hide</h2>
+        <p class="lead">On the home page. Search, Subscriptions and the list next to a video stay as YouTube shows them,
+          but autoplay never plays a video these hide.</p>
+        <div class="panel">
+          <div class="chips">
+            <label class="chip"><input type="checkbox" data-key="shorts">Shorts</label>
+            <label class="chip"><input type="checkbox" data-key="playables">Playables</label>
+            <label class="chip"><input type="checkbox" data-key="news">News and Trending rows</label>
+            <label class="chip"><input type="checkbox" data-key="live">Live and upcoming</label>
+            <label class="chip"><input type="checkbox" data-key="mixes">Mixes</label>
+            <label class="chip"><input type="checkbox" data-key="playlists">Playlists</label>
+          </div>
+          <div class="stack"><span id="lbl-members">Members-only videos</span>
+            <div class="seg" data-key="membersMode" role="group" aria-labelledby="lbl-members">
+              <button data-value="always">Hide</button><button data-value="unlessMember">If I am a member</button><button data-value="never">Show</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="limits" aria-labelledby="h-limits">
+        <h2 id="h-limits">Limits</h2>
+        <div class="panel">
+          <div class="rule">
+            <label class="row"><span>Hide old videos</span><span class="tog"><input type="checkbox" data-key="maxAge"><span></span></span></label>
+            <div class="more"><div><div class="sentence">Older than
+              <input type="number" min="1" data-key="maxAgeValue" aria-label="Age">
+              <select data-key="maxAgeUnit" aria-label="Unit">
+                <option value="days">days</option>
+                <option value="weeks">weeks</option>
+                <option value="months">months</option>
+                <option value="years">years</option>
+              </select>
+            </div></div></div>
+          </div>
+          <div class="rule">
+            <label class="row"><span>Hide low views</span><span class="tog"><input type="checkbox" data-key="minViews"><span></span></span></label>
+            <div class="more"><div><div class="sentence">Fewer than
+              <input type="number" min="0" step="100" data-key="minViewsValue" aria-label="Views"> views
+            </div></div></div>
+          </div>
+          <div class="rule">
+            <label class="row"><span>Hide watched</span><span class="tog"><input type="checkbox" data-key="watched"><span></span></span></label>
+            <div class="more"><div><div class="sentence">Watched more than
+              <input type="number" min="1" max="100" data-key="watchedPct" aria-label="Percent watched"> %
+            </div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="grid" aria-labelledby="h-grid">
+        <h2 id="h-grid">Grid</h2>
+        <div class="panel">
+          <div class="stack"><span id="lbl-perrow">Videos per row</span>
+            <div class="seg" data-key="perRowValue" data-switch="perRow" data-number role="group" aria-labelledby="lbl-perrow">
+              <button data-value="off">Auto</button><button data-value="2">2</button><button data-value="3">3</button><button data-value="4">4</button><button data-value="5">5</button><button data-value="6">6</button>
+            </div>
+          </div>
+          <label class="row"><span>Hide titles</span><span class="tog"><input type="checkbox" data-key="hideTitles"><span></span></span></label>
+          <label class="row"><span>Hide channel names</span><span class="tog"><input type="checkbox" data-key="hideChannels"><span></span></span></label>
+          <label class="row"><span>Hide channel icons</span><span class="tog"><input type="checkbox" data-key="hideAvatars"><span></span></span></label>
+          <label class="row"><span>Hide views, dates and likes</span><span class="tog"><input type="checkbox" data-key="hideMeta"><span></span></span></label>
+          <label class="row"><span>No previews on hover</span><span class="tog"><input type="checkbox" data-key="noPreview"><span></span></span></label>
+        </div>
+      </section>
+
+      <section id="parts" aria-labelledby="h-parts">
+        <h2 id="h-parts">Page parts</h2>
+        <div class="panel two">
+          <div>
+            <h3 class="sec-title">Top bar</h3>
+            <label class="row"><span>YouTube logo</span><span class="tog"><input type="checkbox" data-key="hideLogo" aria-label="Hide the YouTube logo"><span></span></span></label>
+            <label class="row"><span>Search bar</span><span class="tog"><input type="checkbox" data-key="hideSearch" aria-label="Hide the search bar"><span></span></span></label>
+            <label class="row"><span>Create button</span><span class="tog"><input type="checkbox" data-key="hideCreate" aria-label="Hide the Create button"><span></span></span></label>
+            <label class="row"><span>Notifications (bell)</span><span class="tog"><input type="checkbox" data-key="hideBell" aria-label="Hide notifications"><span></span></span></label>
+            <label class="row"><span>Your channel icon</span><span class="tog"><input type="checkbox" data-key="hideAccount" aria-label="Hide your channel icon"><span></span></span></label>
+            <label class="row"><span>Category chips</span><span class="tog"><input type="checkbox" data-key="hideChips" aria-label="Hide the category chips on the home page"><span></span></span></label>
+          </div>
+          <div>
+            <h3 class="sec-title">Sidebar</h3>
+            <label class="row"><span>The whole sidebar</span><span class="tog"><input type="checkbox" data-key="hideSidebar" aria-label="Hide the sidebar"><span></span></span></label>
+            <label class="row"><span>Home</span><span class="tog"><input type="checkbox" data-key="hideNavHome" aria-label="Hide Home in the sidebar"><span></span></span></label>
+            <label class="row"><span>Shorts</span><span class="tog"><input type="checkbox" data-key="hideNavShorts" aria-label="Hide Shorts in the sidebar"><span></span></span></label>
+            <label class="row"><span>Subscriptions</span><span class="tog"><input type="checkbox" data-key="hideNavSubs" aria-label="Hide Subscriptions in the sidebar"><span></span></span></label>
+            <label class="row"><span>You</span><span class="tog"><input type="checkbox" data-key="hideNavYou" aria-label="Hide You in the sidebar"><span></span></span></label>
+          </div>
+        </div>
+        <p class="hint">A switch that is on hides that part.</p>
+      </section>
+
+      <section id="player" aria-labelledby="h-player">
+        <h2 id="h-player">Player</h2>
+        <div class="panel">
+          <label class="row"><span>Autoplay skips watched and repeats</span><span class="tog"><input type="checkbox" data-key="smartAutoplay"><span></span></span></label>
+          <div class="rule">
+            <label class="row"><span>Start at speed</span><span class="tog"><input type="checkbox" data-key="speed"><span></span></span></label>
+            <div class="more"><div><div class="slide">
+              <input type="range" min="0.5" max="2" step="0.05" data-key="speedValue" aria-label="Start speed" id="speed-range">
+              <output for="speed-range" data-for="speedValue"></output>
+            </div></div></div>
+          </div>
+          <div class="stack"><span id="lbl-quality">Start at quality</span>
+            <div class="seg" data-key="qualityValue" data-switch="quality" role="group" aria-labelledby="lbl-quality">
+              <button data-value="off">Off</button><button data-value="highest">Best</button><button data-value="2160">4K</button><button data-value="1440">1440</button><button data-value="1080">1080</button><button data-value="720">720</button>
+            </div>
+          </div>
+          <div class="stack"><span id="lbl-subs">Subtitles</span>
+            <div class="seg" data-key="subtitles" role="group" aria-labelledby="lbl-subs">
+              <button data-value="default">As YouTube</button><button data-value="off">Off</button><button data-value="no">Norsk</button><button data-value="en">English</button>
+            </div>
+          </div>
+          <label class="row"><span>Theater mode</span><span class="tog"><input type="checkbox" data-key="theater"><span></span></span></label>
+          <label class="row"><span>Open Shorts in the normal player</span><span class="tog"><input type="checkbox" data-key="shortsAsVideo"><span></span></span></label>
+          <label class="row"><span>Hide end cards</span><span class="tog"><input type="checkbox" data-key="noEndCards"><span></span></span></label>
+          <label class="row"><span>Hide comments</span><span class="tog"><input type="checkbox" data-key="noComments"><span></span></span></label>
+        </div>
+      </section>
+
+      <section id="block" aria-labelledby="h-block">
+        <h2 id="h-block">Block</h2>
+        <div class="panel">
+          <label class="field">
+            <span>Channels, one per line</span>
+            <textarea data-key="blockChannels" rows="2" spellcheck="false" placeholder="Channel name or @handle"></textarea>
+            <span class="hint">You can also block a channel from the ⋮ menu on any video.</span>
+          </label>
+          <div class="field">
+            <label for="filter-out">Filter out, one per line</label>
+            <textarea id="filter-out" data-key="blockWords" rows="3" spellcheck="false" placeholder="@channel show &quot;only videos with this title show&quot;&#10;@channel hide &quot;videos with this title do not show&quot;" aria-describedby="filter-read"></textarea>
+            <div id="filter-read" class="readback" role="status"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../src/compat.js"></script>
+  <script src="../src/parse.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

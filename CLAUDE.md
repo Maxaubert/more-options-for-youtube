@@ -9,7 +9,10 @@ Firefox/Zen, Chrome/Edge and Safari. Plain JavaScript, no bundler.
 - `src/content.js`: finds tiles and hides them, smart autoplay, the ⋮ menu item.
 - `src/main.js`: runs in the page (`world: MAIN`) to use the YouTube player API.
 - `src/compat.js`: maps `chrome.*` to `browser.*` in Chrome.
-- `popup/`: the settings window (four tabs). Every input has `data-key` = a key in `YTF.DEFAULTS`.
+- `popup/`: `popup.html` (the small popup: most-used switches) and `options.html` (the settings page: every
+  setting). Both run `settings.js` and share `ui.css`. Every input has `data-key` = a key in `YTF.DEFAULTS`.
+- Themes: `src/themes.css` sets YouTube's colour variables. YouTube also uses scrambled variable names that change
+  per release; `content.js` finds them by value (`themeVarOverrides` in `parse.js`). Themes need YouTube's dark theme.
 
 ## Commands
 

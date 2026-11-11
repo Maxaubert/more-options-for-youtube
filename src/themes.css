@@ -1,0 +1,142 @@
+/* Themes for YouTube's page. content.js sets data-ytf-theme on <html>; see content.css for the rest. */
+/* Themes. All dark, and they build on YouTube's dark theme (html[dark]); in YouTube's light theme they do
+   nothing. YouTube draws its colours from --yt-sys-color-baseline--* variables and from variables with
+   scrambled names; content.js maps the scrambled ones (see themeVarOverrides in parse.js). Checked 2026-11-11.
+   Each theme sets the palette below. --ytf-theme-accent replaces YouTube red unless the user picked an accent. */
+html[data-ytf-theme="black"] {
+  --ytf-bg: #000;
+  --ytf-bg-rgb: 0, 0, 0;
+  --ytf-surface: #0a0a0a;
+  --ytf-raised: #111;
+  --ytf-menu: #161616;
+  --ytf-line: #2a2a2a;
+  --ytf-text: #f1f1f1;
+  --ytf-text-2: #b8b8b8;
+  --ytf-link: #3ea6ff;
+}
+html[data-ytf-theme="midnight"] {
+  --ytf-bg: #060a18;
+  --ytf-bg-rgb: 6, 10, 24;
+  --ytf-surface: #0b1226;
+  --ytf-raised: #101a35;
+  --ytf-menu: #162241;
+  --ytf-line: #27365e;
+  --ytf-text: #eef2ff;
+  --ytf-text-2: #aab6d8;
+  --ytf-link: #9db7ff;
+  --ytf-theme-accent: #7c9cff;
+  --ytf-sky: radial-gradient(1200px 700px at 78% 60px, rgba(70, 105, 255, 0.34), transparent 70%),
+    radial-gradient(900px 700px at 5% 45%, rgba(140, 80, 255, 0.2), transparent 70%);
+}
+html[data-ytf-theme="ember"] {
+  --ytf-bg: #120c09;
+  --ytf-bg-rgb: 18, 12, 9;
+  --ytf-surface: #19110d;
+  --ytf-raised: #221712;
+  --ytf-menu: #2b1e16;
+  --ytf-line: #3e2c21;
+  --ytf-text: #fff4eb;
+  --ytf-text-2: #cbb09c;
+  --ytf-link: #ffb37a;
+  --ytf-theme-accent: #ff8a3d;
+}
+html[data-ytf-theme="forest"] {
+  --ytf-bg: #08110d;
+  --ytf-bg-rgb: 8, 17, 13;
+  --ytf-surface: #0d1813;
+  --ytf-raised: #12211a;
+  --ytf-menu: #182b22;
+  --ytf-line: #253a30;
+  --ytf-text: #effbf5;
+  --ytf-text-2: #a8c4b6;
+  --ytf-link: #7ff0c4;
+  --ytf-theme-accent: #4fe0a8;
+}
+html[dark][data-ytf-theme],
+html[dark][data-ytf-theme] [dark] {
+  color-scheme: dark;
+  --yt-sys-color-baseline--base-background: var(--ytf-bg) !important;
+  --yt-sys-color-baseline--static-black: var(--ytf-bg) !important;
+  --yt-sys-color-baseline--solid-background-inverse: var(--ytf-bg) !important;
+  --yt-sys-color-baseline--overlay-solid-background-inverse: var(--ytf-bg) !important;
+  --yt-sys-color-baseline--surface-container: var(--ytf-surface) !important;
+  --yt-sys-color-baseline--raised-background: var(--ytf-raised) !important;
+  --yt-sys-color-baseline--menu-background: var(--ytf-menu) !important;
+  --yt-sys-color-baseline--outline-opaque: var(--ytf-line) !important;
+  --yt-sys-color-baseline--mono-filled-hover-inverse: var(--ytf-raised) !important;
+  --yt-sys-color-baseline--text-primary: var(--ytf-text) !important;
+  --yt-sys-color-baseline--text-secondary: var(--ytf-text-2) !important;
+  --yt-sys-color-baseline--text-disabled: #717171 !important;
+  --yt-sys-color-baseline--text-primary-inverse: var(--ytf-bg) !important;
+  --yt-sys-color-baseline--text-secondary-inverse: #606060 !important;
+  --yt-sys-color-baseline--wordmark-text: #fff !important;
+  --yt-sys-color-baseline--inverted-background: #f1f1f1 !important;
+  --yt-sys-color-baseline--inverted-background-hover: #d9d9d9 !important;
+  --yt-sys-color-baseline--additive-background: rgba(255, 255, 255, 0.1) !important;
+  --yt-sys-color-baseline--tonal-background: rgba(255, 255, 255, 0.1) !important;
+  --yt-sys-color-baseline--button-chip-background-hover: rgba(255, 255, 255, 0.2) !important;
+  --yt-sys-color-baseline--mono-tonal-hover: rgba(255, 255, 255, 0.2) !important;
+  --yt-sys-color-baseline--state-mono-standard-hovered: rgba(255, 255, 255, 0.05) !important;
+  --yt-sys-color-baseline--state-mono-standard-pressed: rgba(255, 255, 255, 0.1) !important;
+  --yt-sys-color-baseline--solid-background: #e6e6e6 !important;
+  --yt-sys-color-baseline--outline: rgba(255, 255, 255, 0.2) !important;
+  --yt-sys-color-baseline--outline-rim: rgba(255, 255, 255, 0.15) !important;
+  --yt-sys-color-baseline--touch-response: #fff !important;
+  --yt-sys-color-baseline--call-to-action: var(--ytf-link) !important;
+  --yt-sys-color-baseline--call-to-action-hover: var(--ytf-link) !important;
+  --yt-sys-color-baseline--suggested-action: #263850 !important;
+  --yt-sys-color-baseline--frosted-glass-desktop: rgba(var(--ytf-bg-rgb), 0.8) !important;
+  --yt-sys-color-baseline--frosted-glass-mobile: rgba(var(--ytf-bg-rgb), 0.7) !important;
+  --yt-sys-color-baseline--frost-container-light: rgba(var(--ytf-bg-rgb), 0.3) !important;
+  --yt-sys-color-baseline--frost-container-medium: rgba(var(--ytf-bg-rgb), 0.6) !important;
+  --yt-sys-color-baseline--frost-container-semi-heavy: rgba(var(--ytf-bg-rgb), 0.75) !important;
+  --yt-sys-color-baseline--frost-container-heavy: rgba(var(--ytf-bg-rgb), 0.85) !important;
+  --yt-sys-color-baseline--scrim-background-gradient-1: rgba(var(--ytf-bg-rgb), 0) !important;
+  --yt-sys-color-baseline--scrim-background-gradient-2: rgba(var(--ytf-bg-rgb), 0.3) !important;
+  --yt-sys-color-baseline--scrim-background-gradient-3: rgba(var(--ytf-bg-rgb), 0.6) !important;
+  --yt-sys-color-baseline--scrim-background-gradient-4: rgba(var(--ytf-bg-rgb), 0.9) !important;
+  --yt-sys-color-baseline--scrim-background-gradient-5: var(--ytf-bg) !important;
+}
+html[dark][data-ytf-theme],
+html[dark][data-ytf-theme] body {
+  background: var(--ytf-bg) !important;
+}
+/* Theme leaks: places that YouTube colours without the variables above. */
+html[dark][data-ytf-theme] ytd-app {
+  background: var(--ytf-bg) !important;
+}
+html[dark][data-ytf-theme] :where(ytd-masthead #background, #masthead-container, ytd-mini-guide-renderer,
+  tp-yt-app-drawer #contentContainer, ytd-guide-renderer, #chips-wrapper.ytd-feed-filter-chip-bar-renderer) {
+  background: var(--ytf-bg) !important;
+}
+html[dark][data-ytf-theme] :where([class*="ytSearchboxComponentInputBox"]) {
+  background: var(--ytf-surface) !important;
+}
+
+/* Midnight: a soft blue and violet sky behind the page. */
+html[dark][data-ytf-theme="midnight"] ytd-app {
+  background: var(--ytf-sky), var(--ytf-bg) !important;
+  background-attachment: fixed !important;
+}
+/* Selected category chip in the theme accent. */
+html[dark][data-ytf-theme]:not([data-ytf-theme="black"]) :is(yt-chip-cloud-chip-renderer[selected], chip-shape button[aria-selected="true"], [class*="ChipShapeActive"]) {
+  color: var(--ytf-bg) !important;
+  background: var(--ytf-theme-accent) !important;
+}
+
+/* Accent: one colour in place of YouTube red (progress bars, the watched bar on thumbnails, badges).
+   The user's own colour (--ytf-accent) wins over the theme's. */
+html[data-ytf-accent],
+html[data-ytf-accent] :is([dark], [light]),
+html[dark][data-ytf-theme]:not([data-ytf-theme="black"]),
+html[dark][data-ytf-theme]:not([data-ytf-theme="black"]) [dark] {
+  --ytf-a: var(--ytf-accent, var(--ytf-theme-accent));
+  --yt-sys-color-baseline--static-brand-red: var(--ytf-a) !important;
+  --yt-sys-color-baseline--red-3: var(--ytf-a) !important;
+  --yt-sys-color-baseline--brand-red-contrast: var(--ytf-a) !important;
+  --yt-sys-color-baseline--overlay-background-brand: var(--ytf-a) !important;
+}
+:is(html[data-ytf-accent], html[dark][data-ytf-theme]:not([data-ytf-theme="black"])) :is(.ytp-play-progress, .ytp-swatch-background-color, .ytp-scrubber-button,
+  ytd-thumbnail-overlay-resume-playback-renderer #progress, [class*="ThumbnailOverlayProgressBarHostWatchedProgressBarSegment"]) {
+  background: var(--ytf-a) !important;
+}

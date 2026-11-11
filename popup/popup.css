@@ -1,182 +1,66 @@
-/* Large type and strong contrast on purpose: the owner has low vision. */
-:root {
-  --bg: #0b0b0c;
-  --panel: #161618;
-  --panel-2: #1f1f23;
-  --line: #2c2c31;
-  --edge: #767680; /* control borders and the off switch: at least 3:1 on the panel */
-  --text: #f4f4f5;
-  --muted: #b4b4bd;
-  --accent: #e5484d;
-  --accent-soft: rgba(229, 72, 77, 0.16);
-  --show: #4cc38a;
-  --show-soft: rgba(76, 195, 138, 0.15);
-  --warn: #f5b942;
-  --warn-soft: rgba(245, 185, 66, 0.12);
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  color-scheme: dark;
-}
-
-* { box-sizing: border-box; }
-::selection { background: var(--accent); color: #fff; }
-
-/* One fixed height (Firefox caps popups at 600 px): only the tab content scrolls, so switching tabs never moves anything. */
+/* The small popup: the switches used most. Everything else is on the settings page (options.html). */
 body {
-  margin: 0;
   width: 380px;
-  height: 600px;
+  max-height: 600px; /* Firefox caps popups at 600 px: only the middle scrolls */
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  color: var(--text);
-  font: 18px/1.35 system-ui, "Segoe UI", sans-serif;
 }
 
-header { display: flex; align-items: center; gap: 10px; padding: 16px 16px 12px; flex: none; }
+header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 8px; flex: none; }
 header img { flex: none; }
 h1 { margin: 0; flex: 1; font-size: 22px; font-weight: 750; letter-spacing: -0.01em; }
 
-/* Tabs */
-.tabs { display: flex; gap: 4px; padding: 0 12px 12px; flex: none; }
-.tabs button {
+main {
   flex: 1;
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-  padding: 8px 2px 7px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
-  background: transparent;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.tabs button:hover { color: var(--text); }
-.tabs svg { width: 20px; height: 20px; stroke: currentColor; }
-.tabs button[aria-selected="true"] { background: var(--panel); color: var(--text); }
-.tabs button[aria-selected="true"] svg { stroke: var(--accent); }
-
-.panes {
-  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: #3a3a40 transparent;
 }
-.pane[hidden] { display: none; }
 
-section { margin: 0 4px 12px 12px; padding: 6px 14px; background: var(--panel); border-radius: 14px; }
+section { margin: 0 4px 6px 12px; padding: 2px 14px; background: var(--panel); border-radius: 14px; }
 
-.sec-title { margin: 8px 0 2px; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--muted); }
+/* Denser than the settings page: the popup has to fit in 600 px. */
+.stack { gap: 6px; padding: 6px 0 6px; }
+.row { min-height: 44px; }
+.chips { gap: 6px; padding: 2px 0 10px; }
+.chip { min-height: 36px; padding: 4px 15px; }
+.sec-title { margin: 6px 0 4px; }
+.inline { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; }
+.inline .seg { flex: 1 1 auto; max-width: 260px; }
+.seg button { white-space: nowrap; min-height: 36px; padding: 6px 4px; }
 
-/* Rows */
-.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; cursor: pointer; }
-.row > span:first-child { flex: 1; }
-:is(.row, .rule, .stack) + :is(.row, .rule, .stack) { border-top: 1px solid var(--line); }
+body.off main { opacity: 0.45; }
+.pick-theme { min-width: 160px; font-weight: 600; }
 
-/* Toggle switches */
-.tog { position: relative; width: 46px; height: 28px; flex: none; }
-.tog input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
-.tog span { position: absolute; inset: 0; border-radius: 999px; background: var(--edge); transition: background 0.2s var(--ease); }
-.tog span::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  transition: transform 0.25s var(--ease);
-}
-.tog input:checked + span { background: var(--accent); }
-.tog input:checked + span::after { transform: translateX(18px); }
-.tog input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
-.tog.big { width: 56px; height: 32px; }
-.tog.big span::after { width: 26px; height: 26px; }
-.tog.big input:checked + span::after { transform: translateX(24px); }
-
-/* Rules: the value boxes open only while the rule is on */
-.more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s var(--ease); }
-.more > div { overflow: hidden; }
-.rule:has(.tog input:checked) .more { grid-template-rows: 1fr; }
-/* Closed rules are also out of the Tab order and hidden from screen readers. */
-.rule:not(:has(.tog input:checked)) .more > div { visibility: hidden; transition: visibility 0s 0.3s; }
-.sentence { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 0 12px; font-size: 16px; color: var(--muted); }
-
-input[type="number"], select {
-  font: inherit;
-  font-size: 17px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--edge);
-  border-radius: 8px;
-  padding: 5px 10px;
-}
-input[type="number"] { width: 90px; }
-
-/* Segmented buttons */
-.stack { display: grid; gap: 8px; padding: 10px 0 12px; }
-.seg { display: flex; gap: 3px; padding: 3px; background: var(--bg); border: 1px solid var(--edge); border-radius: 10px; }
-.seg button {
-  flex: 1;
-  padding: 7px 4px;
-  font: inherit;
+.foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px 8px 16px;
   font-size: 15px;
   color: var(--muted);
-  background: transparent;
-  border: 0;
-  border-radius: 7px;
-  cursor: pointer;
+  border-top: 1px solid var(--line);
 }
-.seg button:hover { color: var(--text); }
-.seg button[aria-pressed="true"] {
-  font-weight: 600;
-  color: var(--text);
-  background: var(--panel-2);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 -3px 0 var(--accent);
-}
-
-/* Block */
-.field { display: grid; gap: 8px; padding: 10px 0 12px; }
-.field + .field { border-top: 1px solid var(--line); }
-textarea {
-  width: 100%;
-  padding: 9px 11px;
-  font: 16px/1.5 system-ui, "Segoe UI", sans-serif;
-  color: var(--text);
-  caret-color: var(--accent);
-  background: var(--bg);
-  border: 1px solid var(--edge);
-  border-radius: 10px;
-  resize: none;
-  overflow: hidden; /* popup.js grows the box to fit its text */
-}
-textarea::placeholder { color: #8e8e98; }
-textarea[aria-invalid="true"] { border-color: var(--warn); }
-
-.readback { display: grid; gap: 6px; }
-.readback:empty { display: none; }
-.rl { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px; }
-.rl .who { font-weight: 600; white-space: nowrap; }
-.rl .what { overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
-.tag { flex: none; padding: 2px 7px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 6px; }
-.tag.show { color: var(--show); background: var(--show-soft); }
-.tag.hide { color: #ff8589; background: var(--accent-soft); }
-.warnbox { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; font-size: 15px; color: var(--warn); background: var(--warn-soft); border-radius: 8px; }
-.warnbox svg { flex: none; width: 18px; height: 18px; margin-top: 1px; stroke: var(--warn); }
-
-:is(input, select, textarea, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-body.off :is(.tabs, .panes) { opacity: 0.45; }
-
-.foot { flex: none; padding: 10px 16px 12px; font-size: 15px; color: var(--muted); border-top: 1px solid var(--line); }
 .foot b { color: var(--text); font-variant-numeric: tabular-nums; }
 
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+.all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--idle-bg);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
 }
+.all:hover { background: var(--idle-hover); }
+.all svg { width: 18px; height: 18px; stroke: currentColor; }

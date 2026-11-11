@@ -51,6 +51,10 @@
     hideBell: false,
     hideAccount: false,
     hideChips: false,
+    // Look: a theme for YouTube's page and a colour in place of YouTube red, both CSS only.
+    theme: "off", // off | black | midnight | ember | forest
+    accent: false,
+    accentColor: "#3ea6ff",
     // Block lists: one entry per line (or comma separated), matched without case
     blockChannels: "",
     blockWords: "",
@@ -59,6 +63,49 @@
 
   const PAGE_PARTS = ["hideSidebar", "hideNavHome", "hideNavShorts", "hideNavSubs", "hideNavYou", "hideLogo",
     "hideSearch", "hideCreate", "hideBell", "hideAccount", "hideChips"];
+
+  const THEMES = ["black", "midnight", "ember", "forest"];
+
+  // The theme and accent for <html>: {theme: one of THEMES | "", accent: "#rrggbb" | ""}.
+  // An unknown theme or a colour that is not #rrggbb gives "", so bad stored values cannot reach the page's CSS.
+  function lookFor(settings) {
+    const on = !!settings.enabled;
+    const theme = on && THEMES.includes(settings.theme) ? settings.theme : "";
+    const color = String(settings.accentColor || "");
+    const accent = on && settings.accent && /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : "";
+    return { theme, accent };
+  }
+
+  // YouTube also keeps its colours in variables with scrambled names (--t + 16 hex digits) that change with
+  // each YouTube release. They hold plain colours, so a theme finds them by value instead: each colour of
+  // YouTube's dark palette maps to the theme's own variable. entries: [[name, value]] read from YouTube's
+  // :root rules, then its [dark] rules (later entries win). Returns "name: value" declarations for the theme block.
+  const DARK_PALETTE = {
+    "#0f0f0f": "var(--ytf-bg)",
+    "#181818": "var(--ytf-surface)",
+    "#212121": "var(--ytf-raised)",
+    "#272727": "var(--ytf-menu)",
+    "#282828": "var(--ytf-menu)",
+    "#3f3f3f": "var(--ytf-line)",
+    "#f1f1f1": "var(--ytf-text)",
+    "#aaa": "var(--ytf-text-2)",
+    "#aaaaaa": "var(--ytf-text-2)",
+    "#3ea6ff": "var(--ytf-link)", // links and the blue buttons
+  };
+  function themeVarOverrides(entries) {
+    const out = new Map();
+    for (const [name, raw] of entries) {
+      if (!/^--(t[0-9a-f]{16}|yt-spec-[a-z0-9-]+)$/.test(name)) continue;
+      const value = String(raw).trim().toLowerCase();
+      let to = DARK_PALETTE[value];
+      const glass = /^rgba\(15, ?15, ?15, ?(0|0?\.\d+|1)\)$/.exec(value);
+      if (glass) to = `rgba(var(--ytf-bg-rgb), ${glass[1]})`;
+      // A later entry wins, also when its colour is not in the palette (then the variable is left alone).
+      out.delete(name);
+      if (to) out.set(name, to);
+    }
+    return [...out].map(([name, to]) => `${name}: ${to} !important;`);
+  }
 
   const REASONS = {
     members: "Members only",
@@ -398,7 +445,7 @@
   }
 
   const YTF = {
-    DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS,
+    DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS, THEMES, lookFor, themeVarOverrides,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
