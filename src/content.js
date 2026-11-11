@@ -30,6 +30,9 @@
   // Channels the user pays a membership for, only needed for "Show if member"; refreshed at most once a day.
   let memberships = null;
   const MEMBERSHIPS_MAX_AGE = 24 * 3600 * 1000;
+  // Channel names of @handles, {"@handle": "name"} in lower case ("" = no such channel). Tiles next to a video
+  // show only the name, so a rule with a handle needs this to match them (Y.channelIs).
+  const channelNames = {};
 
   const texts = (el, sel) => [...el.querySelectorAll(sel)].map((n) => (n.textContent || "").trim()).filter(Boolean);
   const labels = (el, sel) => [...el.querySelectorAll(sel)].map((n) => n.getAttribute("aria-label")).filter(Boolean);
@@ -449,8 +452,58 @@
       browser.storage.local.set(moved); // triggers one more loadSettings, which finds nothing to move
     }
     if (settings.membersMode === "unlessMember") loadMemberships();
+    settings.channelNames = channelNames;
+    lookUpHandles();
     schedule();
   }
+
+  // Adds {"@handle": "name"} pairs to channelNames and saves them (merged with other tabs). Returns whether anything changed.
+  async function learnChannelNames(pairs) {
+    let changed = false;
+    for (const [h, name] of Object.entries(pairs)) {
+      const key = "@" + h.replace(/^@/, "").toLowerCase();
+      const value = name.trim().toLowerCase();
+      if (channelNames[key] !== value) (channelNames[key] = value), (changed = true);
+    }
+    if (!changed) return false;
+    const { ytfChannelNames } = await browser.storage.local.get({ ytfChannelNames: {} });
+    const all = { ...ytfChannelNames, ...channelNames };
+    const keys = Object.keys(all);
+    for (const k of keys.slice(0, Math.max(0, keys.length - 500))) delete all[k];
+    await browser.storage.local.set({ ytfChannelNames: all });
+    schedule();
+    return true;
+  }
+
+  // Channels in the rules that may be @handles and have no known name yet: read youtube.com/@handle once
+  // (same site, nothing leaves YouTube). A page that is not a channel is saved as "" so it is not asked again.
+  const handlesAsked = new Set();
+  async function lookUpHandles() {
+    const todo = Y.ruleHandles(settings).filter((h) => !(h in channelNames) && !handlesAsked.has(h)).slice(0, 10);
+    const found = {};
+    for (const h of todo) {
+      handlesAsked.add(h);
+      try {
+        const res = await fetch("/" + h, { credentials: "include" });
+        if (res.status === 404) found[h] = "";
+        else if (res.ok && new URL(res.url).pathname.toLowerCase().startsWith("/" + h)) found[h] = Y.channelNameFromHtml(await res.text());
+        // Anything else (a consent page, an error): ask again on the next page load.
+      } catch {
+        // offline: ask again on the next page load
+      }
+    }
+    if (Object.keys(found).length) learnChannelNames(found);
+  }
+
+  // The player names the channel of each video it plays, with its @handle (main.js).
+  new MutationObserver(() => {
+    try {
+      const v = JSON.parse(ROOT.dataset.ytfVideo || "null");
+      if (v && v.handle && v.channel) learnChannelNames({ [v.handle]: v.channel });
+    } catch {
+      // ignore
+    }
+  }).observe(ROOT, { attributes: true, attributeFilter: ["data-ytf-video"] });
 
   // Reads the memberships page with the user's own YouTube session (same site, nothing leaves YouTube).
   let membershipsLoading = false;
@@ -487,6 +540,10 @@
     // Videos played or watched in other tabs count here too.
     if (changes.ytfPlayed) (changes.ytfPlayed.newValue || []).forEach((v) => played.add(v));
     if (changes.ytfWatched) (changes.ytfWatched.newValue || []).forEach((v) => watched.add(v));
+    if (changes.ytfChannelNames) {
+      Object.assign(channelNames, changes.ytfChannelNames.newValue || {});
+      schedule();
+    }
   });
   // sendResponse instead of a returned promise: Chrome does not accept a promise as the reply.
   browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -512,9 +569,10 @@
   });
 
   (async () => {
-    const saved = await browser.storage.local.get({ ytfPlayed: [], ytfWatched: [] });
+    const saved = await browser.storage.local.get({ ytfPlayed: [], ytfWatched: [], ytfChannelNames: {} });
     saved.ytfPlayed.forEach((id) => played.add(id));
     saved.ytfWatched.forEach((id) => watched.add(id));
+    Object.assign(channelNames, saved.ytfChannelNames);
     await loadSettings();
     shortsToWatch();
     if (location.pathname === "/watch" && currentId()) remember(played, "ytfPlayed", currentId());
