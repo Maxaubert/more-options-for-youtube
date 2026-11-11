@@ -207,10 +207,28 @@
   }
 
   // Whether a tile's channel is the listed name c (lower case): the exact name or its @handle.
-  function channelIs(info, c) {
+  // Tiles next to a video show only the channel name, not the @handle. names = {"@handle": "channel name"}
+  // (lower case, from content.js) lets a handle in a rule match those tiles too.
+  function channelIs(info, c, names) {
     const channel = (info.channel || "").trim().toLowerCase();
     if (channel && (c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
+    const known = names && names["@" + c.replace(/^@/, "")];
+    if (channel && known && known === channel) return true;
     return !!info.handle && info.handle.toLowerCase() === c;
+  }
+
+  // Channels in the rules that may be @handles (one word): content.js looks up their channel names.
+  function ruleHandles(s) {
+    const listed = [...parseList(s.blockChannels), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
+    return [...new Set(listed.map((c) => "@" + c.replace(/^@/, "")).filter((c) => /^@[\w.-]{3,30}$/.test(c)))];
+  }
+
+  // The channel name (lower case) from the HTML of a youtube.com/@handle page, or "".
+  function channelNameFromHtml(html) {
+    const m = /<meta property="og:title" content="([^"]*)"/.exec(html || "");
+    if (!m) return "";
+    const ENT = { amp: "&", quot: '"', lt: "<", gt: ">", apos: "'", "#39": "'" };
+    return m[1].replace(/&(amp|quot|lt|gt|apos|#39);/g, (_, e) => ENT[e]).trim().toLowerCase();
   }
 
   // Title rules, one per line (the "Filter out" field):
@@ -282,14 +300,14 @@
     return rulesCache.get(text);
   }
 
-  const ruleFits = (info, r) => !r.channel || channelIs(info, r.channel);
+  const ruleFits = (info, r, names) => !r.channel || channelIs(info, r.channel, names);
   const titleHas = (title, r) => r.words.some((w) => title.includes(w));
 
   // Channel must match a listed name exactly (or its @handle); a block rule's word matches anywhere in the title.
   function isBlocked(info, s) {
-    if (parseList(s.blockChannels).some((c) => channelIs(info, c))) return true;
+    if (parseList(s.blockChannels).some((c) => channelIs(info, c, s.channelNames))) return true;
     const title = (info.title || "").toLowerCase();
-    return !!title && parseTitleRules(s.blockWords).some((r) => !r.only && ruleFits(info, r) && titleHas(title, r));
+    return !!title && parseTitleRules(s.blockWords).some((r) => !r.only && ruleFits(info, r, s.channelNames) && titleHas(title, r));
   }
 
   // With "only" rules for a channel, its videos stay only if the title holds one of their words.
@@ -297,7 +315,7 @@
   function failsKeepOnly(info, s) {
     const title = (info.title || "").toLowerCase();
     if (!title) return false;
-    const rules = parseTitleRules(s.blockWords).filter((r) => r.only && ruleFits(info, r));
+    const rules = parseTitleRules(s.blockWords).filter((r) => r.only && ruleFits(info, r, s.channelNames));
     return rules.length > 0 && !rules.some((r) => titleHas(title, r));
   }
 
@@ -447,7 +465,7 @@
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS, THEMES, lookFor, themeVarOverrides,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
-    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
+    isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, ruleHandles, channelNameFromHtml, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;

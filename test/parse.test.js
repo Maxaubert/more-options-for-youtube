@@ -327,3 +327,25 @@ test("theme finds YouTube's scrambled colour variables by value", () => {
     "--t0123456789abcdef: var(--ytf-bg) !important;",
   ]);
 });
+
+test("a handle rule matches tiles that show only the channel name, once the name is known", () => {
+  const tile = { kind: "video", channel: "gameranx", handle: "", title: "20 Game Franchises That DIED" };
+  const s = { ...S, blockWords: '@gameranxTV show "Before you buy"' };
+  assert.equal(Y.decideTile(tile, s), null); // name unknown: the sidebar tile cannot be matched
+  const known = { ...s, channelNames: { "@gameranxtv": "gameranx" } };
+  assert.equal(Y.decideTile(tile, known), "keepOnly");
+  assert.equal(Y.decideTile({ ...tile, title: "Before You Buy: Halo" }, known), null);
+  assert.equal(Y.decideTile(tile, { ...S, blockChannels: "@gameranxTV", channelNames: { "@gameranxtv": "gameranx" } }), "blocked");
+  assert.equal(Y.decideTile({ ...tile, channel: "other" }, known), null);
+  assert.equal(Y.decideTile(tile, { ...s, channelNames: { "@gameranxtv": "" } }), null);
+});
+
+test("ruleHandles lists one-word rule channels as @handles", () => {
+  const s = { ...S, blockChannels: "Linus Tech Tips\n@MrBeast", blockWords: '@gameranxTV show "x"\n@any "shorts"\n@The Late Show hide "a"\nclickbait' };
+  assert.deepEqual(Y.ruleHandles(s), ["@mrbeast", "@gameranxtv"]);
+});
+
+test("channelNameFromHtml reads og:title", () => {
+  assert.equal(Y.channelNameFromHtml('<meta property="og:title" content="Tom &amp; Jerry &#39;Official&#39;">'), "tom & jerry 'official'");
+  assert.equal(Y.channelNameFromHtml("<html></html>"), "");
+});
