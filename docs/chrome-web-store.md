@@ -20,6 +20,11 @@ Answers for the Chrome Web Store dashboard, and how updates are sent. The store 
 If a version is still in review, Google refuses the upload. `npm run publish:chrome -- --replace` cancels
 that review and sends the new version; the review starts again.
 
+Google limits how often a review can be cancelled. On 2026-11-11 the third cancel in about 3 hours got
+`HTTP 429 RESOURCE_EXHAUSTED` ("'CancelSubmission' request limit reached"). Then the version in review
+stays. Run `--replace` again later (the next day is safe), or wait until the review ends and run
+`npm run publish:chrome` without `--replace`.
+
 Other commands:
 - `npm run publish:chrome -- --dry-run`: build and sign in, but upload nothing.
 - `npm run publish:chrome -- --upload-only`: upload, but do not send for review.
