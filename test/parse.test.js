@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const Y = require("../src/parse.js");
+const P = require("../src/player.js");
 
 const S = { ...Y.DEFAULTS };
 
@@ -201,6 +202,42 @@ test("warnings for lines typed wrong", () => {
   );
 });
 
+test("a channel rule typed without the @ gets a warning", () => {
+  assert.deepEqual(Y.checkTitleRules('gameranxTV show "Before you buy"'), [
+    'Line 1: start the line with @ and the channel, like @channel show "words". Without @ it is read as title words.',
+  ]);
+  assert.equal(Y.checkTitleRules('The Late Show only "x"').length, 1);
+  assert.equal(Y.checkTitleRules('gameranx HIDE "top 10"').length, 1);
+  // Plain title words stay valid, also with quotes or with show/hide inside the words.
+  assert.deepEqual(Y.checkTitleRules('reaction\n"top 10"\nshowcase, "hide and seek"\nTV show'), []);
+});
+
+test("smart autoplay checks its own pick against the player's channel and title", () => {
+  // Max's rule (2026-11-15): only Before You Buy videos from gameranx (@gameranxTV).
+  const settings = { ...S, blockWords: '@gameranxTV show "Before you buy"', channelNames: {} };
+  const base = { played: new Set(["other"]), watched: new Set(), settings, picked: true };
+  const gameranx = (title) => ({ title, channel: "gameranx", handle: "@gameranxTV" });
+  // Picked from a tile read without the channel's name: the player shows it is a gameranx video that is not BYB.
+  assert.equal(Y.autoplaySkip("x", { ...base, video: gameranx("20 Game of The Year Contenders of 2026") }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video: gameranx("Phantom Blade Zero - Before You Buy") }), null);
+  assert.equal(Y.autoplaySkip("x", { ...base, video: { title: "Zelda review", channel: "Skill Up", handle: "@SkillUp" } }), null);
+  // Not loaded yet: nothing to check.
+  assert.equal(Y.autoplaySkip("x", base), null);
+  // Our own pick is never skipped as played (it is played the moment it opens).
+  assert.equal(Y.autoplaySkip("x", { ...base, played: new Set(["x"]), video: gameranx("Phantom Blade Zero - Before You Buy") }), null);
+  // The tile in the sidebar (name only) matches once the handle's name is known.
+  const tile = video({ channel: "gameranx", title: "20 Game of The Year Contenders of 2026" });
+  assert.equal(Y.decideTile(tile, settings), null);
+  assert.equal(Y.decideTile(tile, { ...settings, channelNames: { "@gameranxtv": "gameranx" } }), "keepOnly");
+});
+
+test("channel name from the texts under a tile", () => {
+  assert.equal(Y.channelFromTexts(["gameranx", "822K", "11d ago"]), "gameranx");
+  assert.equal(Y.channelFromTexts(["822 thousand views", "11 days ago", "Skill Up"]), "Skill Up");
+  assert.equal(Y.channelFromTexts(["1,6 mill. avspillinger", "for 2 døgn siden"]), "");
+  assert.equal(Y.channelFromTexts([]), "");
+});
+
 test("a show or hide rule without a channel name is ignored, not applied to every channel", () => {
   assert.deepEqual(Y.parseTitleRules('@show "x"'), []);
   assert.deepEqual(Y.parseTitleRules('@ show "x"'), []);
@@ -237,24 +274,24 @@ test("video ids", () => {
 
 test("quality", () => {
   const levels = ["hd1080", "hd720", "large", "medium", "small", "tiny", "auto"];
-  assert.equal(Y.pickQuality(levels, "highest"), "hd1080");
-  assert.equal(Y.pickQuality(levels, "2160"), "hd1080");
-  assert.equal(Y.pickQuality(levels, "720"), "hd720");
-  assert.equal(Y.pickQuality(levels, "480"), "large");
-  assert.equal(Y.pickQuality(["auto"], "highest"), null);
+  assert.equal(P.pickQuality(levels, "highest"), "hd1080");
+  assert.equal(P.pickQuality(levels, "2160"), "hd1080");
+  assert.equal(P.pickQuality(levels, "720"), "hd720");
+  assert.equal(P.pickQuality(levels, "480"), "large");
+  assert.equal(P.pickQuality(["auto"], "highest"), null);
 });
 
 test("subtitles", () => {
   const en = { languageCode: "en", kind: "" };
   const enAuto = { languageCode: "en", kind: "asr" };
   const nb = { languageCode: "nb", kind: "" };
-  assert.equal(Y.pickSubtitles([en], "default"), null);
-  assert.equal(Y.pickSubtitles([en], "off"), "off");
-  assert.deepEqual(Y.pickSubtitles([en, nb], "no"), { track: nb });
-  assert.deepEqual(Y.pickSubtitles([{ languageCode: "no" }], "no"), { track: { languageCode: "no" } });
-  assert.deepEqual(Y.pickSubtitles([enAuto, en], "no"), { translate: en, to: "no" });
-  assert.deepEqual(Y.pickSubtitles([enAuto, en], "en"), { track: en });
-  assert.equal(Y.pickSubtitles([], "no"), null);
+  assert.equal(P.pickSubtitles([en], "default"), null);
+  assert.equal(P.pickSubtitles([en], "off"), "off");
+  assert.deepEqual(P.pickSubtitles([en, nb], "no"), { track: nb });
+  assert.deepEqual(P.pickSubtitles([{ languageCode: "no" }], "no"), { track: { languageCode: "no" } });
+  assert.deepEqual(P.pickSubtitles([enAuto, en], "no"), { translate: en, to: "no" });
+  assert.deepEqual(P.pickSubtitles([enAuto, en], "en"), { track: en });
+  assert.equal(P.pickSubtitles([], "no"), null);
 });
 
 test("smart autoplay picks the first new video", () => {

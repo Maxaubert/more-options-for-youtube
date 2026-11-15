@@ -75,7 +75,7 @@
         ? channelEl.textContent.trim()
         : avatar
           ? avatar.getAttribute("aria-label").replace(/^(Go to channel|Gå til kanalen) /, "").trim()
-          : "",
+          : Y.channelFromTexts(texts(tile, '[class*="ContentMetadataViewModelMetadataRow"] [class*="MetadataText"]')),
       handle: handleLink ? handleLink.getAttribute("href").slice(1).split(/[/?]/)[0] : "",
       members: badges.some(Y.isMembersOnly) || meta.some(Y.isMembersOnly),
       live: styles.includes("LIVE") || badges.some(Y.isLiveBadge) || meta.some(Y.isWatching),
@@ -332,12 +332,12 @@
     endedAt = 0;
     const picked = ourPick === id;
     ourPick = "";
-    const known = { played: new Set(played), watched, tile: tileState.get(id), settings };
+    const known = { played: new Set(played), watched, tile: tileState.get(id), settings, picked };
     remember(played, "ytfPlayed", id);
-    if (!settings.enabled || !settings.smartAutoplay || !autoplayed || picked) return;
+    if (!settings.enabled || !settings.smartAutoplay || !(autoplayed || picked)) return;
     const why = Y.autoplaySkip(id, known);
     if (why) return skipRepeat(id, why !== "hidden");
-    // Not known from a tile: wait for the player's title and channel (main.js), then check the filters.
+    // Not known from a tile, or our own pick: wait for the player's title and channel (main.js), then check the filters.
     let tries = 0;
     const timer = setInterval(() => {
       let video = null;
