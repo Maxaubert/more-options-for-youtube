@@ -63,8 +63,8 @@ Reads YouTube in English and Norwegian. The popup uses large, high-contrast type
 
 ## Install
 
-**From the stores:** both are in review (November 2026).
-- Firefox and Zen: addons.mozilla.org
+**From the stores** (both public since November 2026):
+- Firefox and Zen: [addons.mozilla.org](https://addons.mozilla.org/addon/more-options-for-youtube/)
 - Chrome and Edge: [Chrome Web Store](https://chromewebstore.google.com/detail/igjngbapajhfjnbldgacaajdccpfnfcp)
 
 **Firefox and Zen, from source:**

@@ -12,6 +12,8 @@ so each store has the newest version in review or live. To check:
 - Chrome: `python scripts/publish-chrome.py status`.
 
 Neither store had the add-on public on 2026-11-10; both were reviewing 0.5.5.
+Checked 2026-11-15: both public with 0.7.2. AMO approved 0.7.2 on 2026-11-14 (email; AMO API status `public`).
+Chrome: `publish-chrome.py status` says PUBLISHED, 0.7.2, 100% rollout.
 
 ## Name
 
