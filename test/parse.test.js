@@ -201,6 +201,42 @@ test("warnings for lines typed wrong", () => {
   );
 });
 
+test("a channel rule typed without the @ gets a warning", () => {
+  assert.deepEqual(Y.checkTitleRules('gameranxTV show "Before you buy"'), [
+    'Line 1: start the line with @ and the channel, like @channel show "words". Without @ it is read as title words.',
+  ]);
+  assert.equal(Y.checkTitleRules('The Late Show only "x"').length, 1);
+  assert.equal(Y.checkTitleRules('gameranx HIDE "top 10"').length, 1);
+  // Plain title words stay valid, also with quotes or with show/hide inside the words.
+  assert.deepEqual(Y.checkTitleRules('reaction\n"top 10"\nshowcase, "hide and seek"\nTV show'), []);
+});
+
+test("smart autoplay checks its own pick against the player's channel and title", () => {
+  // Max's rule (2026-11-15): only Before You Buy videos from gameranx (@gameranxTV).
+  const settings = { ...S, blockWords: '@gameranxTV show "Before you buy"', channelNames: {} };
+  const base = { played: new Set(["other"]), watched: new Set(), settings, picked: true };
+  const gameranx = (title) => ({ title, channel: "gameranx", handle: "@gameranxTV" });
+  // Picked from a tile read without the channel's name: the player shows it is a gameranx video that is not BYB.
+  assert.equal(Y.autoplaySkip("x", { ...base, video: gameranx("20 Game of The Year Contenders of 2026") }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video: gameranx("Phantom Blade Zero - Before You Buy") }), null);
+  assert.equal(Y.autoplaySkip("x", { ...base, video: { title: "Zelda review", channel: "Skill Up", handle: "@SkillUp" } }), null);
+  // Not loaded yet: nothing to check.
+  assert.equal(Y.autoplaySkip("x", base), null);
+  // Our own pick is never skipped as played (it is played the moment it opens).
+  assert.equal(Y.autoplaySkip("x", { ...base, played: new Set(["x"]), video: gameranx("Phantom Blade Zero - Before You Buy") }), null);
+  // The tile in the sidebar (name only) matches once the handle's name is known.
+  const tile = video({ channel: "gameranx", title: "20 Game of The Year Contenders of 2026" });
+  assert.equal(Y.decideTile(tile, settings), null);
+  assert.equal(Y.decideTile(tile, { ...settings, channelNames: { "@gameranxtv": "gameranx" } }), "keepOnly");
+});
+
+test("channel name from the texts under a tile", () => {
+  assert.equal(Y.channelFromTexts(["gameranx", "822K", "11d ago"]), "gameranx");
+  assert.equal(Y.channelFromTexts(["822 thousand views", "11 days ago", "Skill Up"]), "Skill Up");
+  assert.equal(Y.channelFromTexts(["1,6 mill. avspillinger", "for 2 døgn siden"]), "");
+  assert.equal(Y.channelFromTexts([]), "");
+});
+
 test("a show or hide rule without a channel name is ignored, not applied to every channel", () => {
   assert.deepEqual(Y.parseTitleRules('@show "x"'), []);
   assert.deepEqual(Y.parseTitleRules('@ show "x"'), []);

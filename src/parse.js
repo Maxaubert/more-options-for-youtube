@@ -247,8 +247,15 @@
     const out = [];
     (text || "").split("\n").forEach((raw, i) => {
       const line = raw.trim();
-      if (!line.startsWith("@")) return;
       const n = `Line ${i + 1}: `;
+      if (!line.startsWith("@")) {
+        // 'gameranxTV show "Before you buy"' without the "@" is read as plain title words, not as a channel rule.
+        const head = line.slice(0, line.indexOf('"'));
+        if (line.includes('"') && /(^|\s)(show|only|hide)\s*$/i.test(head)) {
+          out.push(n + 'start the line with @ and the channel, like @channel show "words". Without @ it is read as title words.');
+        }
+        return;
+      }
       const quote = line.indexOf('"');
       if (quote < 0) return out.push(n + 'put the title words in quotes, like @channel show "words".');
       if ((line.match(/"/g) || []).length % 2) return out.push(n + "a quote mark is missing.");
@@ -449,24 +456,37 @@
   }
 
   // Why smart autoplay should skip a video it just landed on, or null to keep it.
-  // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel} from the player.
-  function autoplaySkip(id, { played, watched, tile, video, settings }) {
+  // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel, handle} from the player.
+  // picked: smart autoplay chose this video itself from the sidebar. It was not played or watched then, but its tile
+  // may have been read wrong (no channel name on it, or the @handle's name not known yet), so the player's title and
+  // channel are still checked against the filters.
+  function autoplaySkip(id, { played, watched, tile, video, settings, picked = false }) {
+    if (picked) return video && video.title && filteredVideo(video, settings) ? "hidden" : null;
     if (played.has(id)) return "played";
     if (watched.has(id)) return "watched";
     if (tile && tile.watchedPct != null) return "watched";
     if (tile && tile.reason) return "hidden";
-    if (video && video.title) {
-      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
-      if (reason === "blocked" || reason === "keepOnly") return "hidden";
-    }
+    if (video && video.title && filteredVideo(video, settings)) return "hidden";
     return null;
+  }
+
+  // Whether the filters hide the video the player plays ({title, channel, handle}).
+  function filteredVideo(video, settings) {
+    const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
+    return reason === "blocked" || reason === "keepOnly";
+  }
+
+  // The channel name among the texts under a tile (["gameranx", "822K", "11d ago"]): the first one that is not
+  // views, a date or live info. For tiles with no channel link or avatar to read the name from.
+  function channelFromTexts(list) {
+    return (list || []).find((t) => t && !isMetaText(t)) || "";
   }
 
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS, THEMES, lookFor, themeVarOverrides,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, ruleHandles, channelNameFromHtml, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
-    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
+    isMetaText, channelFromTexts, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;
