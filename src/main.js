@@ -1,19 +1,21 @@
 // Runs in the page itself (content script world "MAIN"), because only the page can call the YouTube
 // player's own API. Applies speed, quality, theater mode and subtitles once per video. Settings come
-// from content.js through <html data-ytf-settings>, since this world has no extension APIs.
+// from content.js through <html data-ytf-settings>, since this world has no extension APIs. content.js writes
+// the full settings (its DEFAULTS included), so this file needs only src/player.js, not src/parse.js.
 (function () {
   "use strict";
-  const Y = globalThis.YTF;
+  const Y = globalThis.YTFPlayer;
   const MAX_TRIES = 30; // about 15 s: quality levels and caption tracks appear only once the video loads
 
   let doneFor = "";
   let tries = 0;
 
+  // Empty until content.js has loaded the settings: enabled is then missing, so nothing is applied yet.
   const settings = () => {
     try {
-      return { ...Y.DEFAULTS, ...JSON.parse(document.documentElement.dataset.ytfSettings || "{}") };
+      return JSON.parse(document.documentElement.dataset.ytfSettings || "{}");
     } catch {
-      return { ...Y.DEFAULTS };
+      return {};
     }
   };
 

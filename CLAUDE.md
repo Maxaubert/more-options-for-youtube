@@ -7,7 +7,9 @@ Firefox/Zen, Chrome/Edge and Safari. Plain JavaScript, no bundler.
 
 - `src/parse.js`: pure text and rule logic, no DOM. Covered by `test/parse.test.js`. Put new logic here.
 - `src/content.js`: finds tiles and hides them, smart autoplay, the ⋮ menu item.
-- `src/main.js`: runs in the page (`world: MAIN`) to use the YouTube player API.
+- `src/main.js`: runs in the page (`world: MAIN`) to use the YouTube player API. Its helpers are in `src/player.js`.
+  Never list one file in two content-script entries: Chromium injects it in the first world only
+  (`test/manifest.test.js` checks this).
 - `src/compat.js`: maps `chrome.*` to `browser.*` in Chrome.
 - `popup/`: `popup.html` (the small popup: most-used switches) and `options.html` (the settings page: every
   setting). Both run `settings.js` and share `ui.css`. Every input has `data-key` = a key in `YTF.DEFAULTS`.

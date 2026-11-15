@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "More Options for YouTube",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Hide Shorts, members-only and old videos, block channels, skip repeats in autoplay, set player defaults, and theme YouTube.",
   "browser_specific_settings": {
     "gecko": {
@@ -22,7 +22,7 @@
     },
     {
       "matches": ["*://www.youtube.com/*"],
-      "js": ["src/parse.js", "src/main.js"],
+      "js": ["src/player.js", "src/main.js"],
       "world": "MAIN",
       "run_at": "document_idle"
     }

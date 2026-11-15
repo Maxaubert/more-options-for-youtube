@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const Y = require("../src/parse.js");
+const P = require("../src/player.js");
 
 const S = { ...Y.DEFAULTS };
 
@@ -273,24 +274,24 @@ test("video ids", () => {
 
 test("quality", () => {
   const levels = ["hd1080", "hd720", "large", "medium", "small", "tiny", "auto"];
-  assert.equal(Y.pickQuality(levels, "highest"), "hd1080");
-  assert.equal(Y.pickQuality(levels, "2160"), "hd1080");
-  assert.equal(Y.pickQuality(levels, "720"), "hd720");
-  assert.equal(Y.pickQuality(levels, "480"), "large");
-  assert.equal(Y.pickQuality(["auto"], "highest"), null);
+  assert.equal(P.pickQuality(levels, "highest"), "hd1080");
+  assert.equal(P.pickQuality(levels, "2160"), "hd1080");
+  assert.equal(P.pickQuality(levels, "720"), "hd720");
+  assert.equal(P.pickQuality(levels, "480"), "large");
+  assert.equal(P.pickQuality(["auto"], "highest"), null);
 });
 
 test("subtitles", () => {
   const en = { languageCode: "en", kind: "" };
   const enAuto = { languageCode: "en", kind: "asr" };
   const nb = { languageCode: "nb", kind: "" };
-  assert.equal(Y.pickSubtitles([en], "default"), null);
-  assert.equal(Y.pickSubtitles([en], "off"), "off");
-  assert.deepEqual(Y.pickSubtitles([en, nb], "no"), { track: nb });
-  assert.deepEqual(Y.pickSubtitles([{ languageCode: "no" }], "no"), { track: { languageCode: "no" } });
-  assert.deepEqual(Y.pickSubtitles([enAuto, en], "no"), { translate: en, to: "no" });
-  assert.deepEqual(Y.pickSubtitles([enAuto, en], "en"), { track: en });
-  assert.equal(Y.pickSubtitles([], "no"), null);
+  assert.equal(P.pickSubtitles([en], "default"), null);
+  assert.equal(P.pickSubtitles([en], "off"), "off");
+  assert.deepEqual(P.pickSubtitles([en, nb], "no"), { track: nb });
+  assert.deepEqual(P.pickSubtitles([{ languageCode: "no" }], "no"), { track: { languageCode: "no" } });
+  assert.deepEqual(P.pickSubtitles([enAuto, en], "no"), { translate: en, to: "no" });
+  assert.deepEqual(P.pickSubtitles([enAuto, en], "en"), { track: en });
+  assert.equal(P.pickSubtitles([], "no"), null);
 });
 
 test("smart autoplay picks the first new video", () => {
