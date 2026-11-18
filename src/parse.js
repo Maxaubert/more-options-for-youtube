@@ -209,17 +209,38 @@
   // Whether a tile's channel is the listed name c (lower case): the exact name or its @handle.
   // Tiles next to a video show only the channel name, not the @handle. names = {"@handle": "channel name"}
   // (lower case, from content.js) lets a handle in a rule match those tiles too.
-  function channelIs(info, c, names) {
+  function channelIs(info, rule, names) {
+    const c = channelKey(rule);
+    if (/^uc[\w-]{22}$/.test(c)) return !!info.channelId && info.channelId.toLowerCase() === c;
     const channel = (info.channel || "").trim().toLowerCase();
     if (channel && (c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
     const known = names && names["@" + c.replace(/^@/, "")];
     if (channel && known && known === channel) return true;
-    return !!info.handle && info.handle.toLowerCase() === c;
+    return !!info.handle && info.handle.toLowerCase() === "@" + c.replace(/^@/, "");
+  }
+
+  // A pasted channel link means its @handle or channel ID: "https://www.youtube.com/@gameranxTV/videos" -> "@gameranxtv",
+  // "youtube.com/channel/UC..." -> "uc...". Anything else stays as typed (lower case).
+  function channelKey(c) {
+    const m = /^(?:https?:\/\/)?(?:www\.|m\.)?youtube\.com\/(?:(@[^/?#\s]+)|channel\/(uc[\w-]{22}))/i.exec(c);
+    if (!m) return c;
+    if (m[2]) return m[2].toLowerCase();
+    try {
+      return decodeURIComponent(m[1]).toLowerCase();
+    } catch {
+      return m[1].toLowerCase();
+    }
+  }
+
+  // The channel name among the text parts under a tile: the first part that is not views, date or live info.
+  // The list next to a video shows the channel only this way, with no avatar or @handle link.
+  function channelFromParts(parts) {
+    return (parts || []).map((t) => (t || "").trim()).find((t) => t && !isMetaText(t)) || "";
   }
 
   // Channels in the rules that may be @handles (one word): content.js looks up their channel names.
   function ruleHandles(s) {
-    const listed = [...parseList(s.blockChannels), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
+    const listed = [...parseList(s.blockChannels).map(channelKey), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
     return [...new Set(listed.map((c) => "@" + c.replace(/^@/, "")).filter((c) => /^@[\w.-]{3,30}$/.test(c)))];
   }
 
@@ -450,13 +471,18 @@
 
   // Why smart autoplay should skip a video it just landed on, or null to keep it.
   // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel} from the player.
-  function autoplaySkip(id, { played, watched, tile, video, settings }) {
-    if (played.has(id)) return "played";
-    if (watched.has(id)) return "watched";
+  // filtersOnly: the add-on picked this video itself, so only the filters are checked again.
+  function autoplaySkip(id, { played, watched, tile, video, settings, filtersOnly }) {
+    if (!filtersOnly) {
+      if (played.has(id)) return "played";
+      if (watched.has(id)) return "watched";
+    }
     if (tile && tile.watchedPct != null) return "watched";
     if (tile && tile.reason) return "hidden";
     if (video && video.title) {
-      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
+      const reason = decideTile({
+        kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "", channelId: video.channelId || "",
+      }, settings);
       if (reason === "blocked" || reason === "keepOnly") return "hidden";
     }
     return null;
@@ -467,6 +493,7 @@
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, ruleHandles, channelNameFromHtml, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
     isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
+    channelKey, channelFromParts,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;

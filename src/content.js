@@ -75,7 +75,7 @@
         ? channelEl.textContent.trim()
         : avatar
           ? avatar.getAttribute("aria-label").replace(/^(Go to channel|Gå til kanalen) /, "").trim()
-          : "",
+          : Y.channelFromParts(texts(tile, '[class*="ContentMetadataViewModelMetadataRow"] [class*="MetadataText"]')),
       handle: handleLink ? handleLink.getAttribute("href").slice(1).split(/[/?]/)[0] : "",
       members: badges.some(Y.isMembersOnly) || meta.some(Y.isMembersOnly),
       live: styles.includes("LIVE") || badges.some(Y.isLiveBadge) || meta.some(Y.isWatching),
@@ -334,7 +334,9 @@
     ourPick = "";
     const known = { played: new Set(played), watched, tile: tileState.get(id), settings };
     remember(played, "ytfPlayed", id);
-    if (!settings.enabled || !settings.smartAutoplay || !autoplayed || picked) return;
+    if (!settings.enabled || !settings.smartAutoplay || !(autoplayed || picked)) return;
+    // Our own pick is checked again against the player's channel, in case the tile did not show it.
+    if (picked) known.filtersOnly = true;
     const why = Y.autoplaySkip(id, known);
     if (why) return skipRepeat(id, why !== "hidden");
     // Not known from a tile: wait for the player's title and channel (main.js), then check the filters.
