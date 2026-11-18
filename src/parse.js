@@ -209,17 +209,32 @@
   // Whether a tile's channel is the listed name c (lower case): the exact name or its @handle.
   // Tiles next to a video show only the channel name, not the @handle. names = {"@handle": "channel name"}
   // (lower case, from content.js) lets a handle in a rule match those tiles too.
-  function channelIs(info, c, names) {
+  function channelIs(info, rule, names) {
+    const c = channelKey(rule);
+    if (/^uc[\w-]{22}$/.test(c)) return !!info.channelId && info.channelId.toLowerCase() === c;
     const channel = (info.channel || "").trim().toLowerCase();
     if (channel && (c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
     const known = names && names["@" + c.replace(/^@/, "")];
     if (channel && known && known === channel) return true;
-    return !!info.handle && info.handle.toLowerCase() === c;
+    return !!info.handle && info.handle.toLowerCase() === "@" + c.replace(/^@/, "");
+  }
+
+  // A pasted channel link means its @handle or channel ID: "https://www.youtube.com/@gameranxTV/videos" -> "@gameranxtv",
+  // "youtube.com/channel/UC..." -> "uc...". Anything else stays as typed (lower case).
+  function channelKey(c) {
+    const m = /^(?:https?:\/\/)?(?:www\.|m\.)?youtube\.com\/(?:(@[^/?#\s]+)|channel\/(uc[\w-]{22}))/i.exec(c);
+    if (!m) return c;
+    if (m[2]) return m[2].toLowerCase();
+    try {
+      return decodeURIComponent(m[1]).toLowerCase();
+    } catch {
+      return m[1].toLowerCase();
+    }
   }
 
   // Channels in the rules that may be @handles (one word): content.js looks up their channel names.
   function ruleHandles(s) {
-    const listed = [...parseList(s.blockChannels), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
+    const listed = [...parseList(s.blockChannels).map(channelKey), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
     return [...new Set(listed.map((c) => "@" + c.replace(/^@/, "")).filter((c) => /^@[\w.-]{3,30}$/.test(c)))];
   }
 
@@ -447,7 +462,7 @@
 
   // Whether the filters hide the video the player plays ({title, channel, handle}).
   function filteredVideo(video, settings) {
-    const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
+    const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "", channelId: video.channelId || "" }, settings);
     return reason === "blocked" || reason === "keepOnly";
   }
 
@@ -461,7 +476,7 @@
     DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS, THEMES, lookFor, themeVarOverrides,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, ruleHandles, channelNameFromHtml, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
-    isMetaText, channelFromTexts, videoIdFromHref, pickNext, wasAutoplay, autoplaySkip,
+    isMetaText, channelFromTexts, videoIdFromHref, pickNext, wasAutoplay, autoplaySkip, channelKey,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;

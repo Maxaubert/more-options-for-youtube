@@ -91,7 +91,8 @@ Needs Chrome 111 or newer (for the script that talks to the player).
 - **Hidden count:** on a page the filters cover, the bottom of the popup shows how many videos were hidden
   and why, so you can check nothing is hidden by mistake.
 - **Block a channel:** open the ⋮ menu on any video and choose **Block channel**, or type names into the
-  Block section of the settings page (one per line). Remove a line to unblock.
+  Block section of the settings page (one per line). A name, an @handle or a pasted channel link all work.
+  Remove a line to unblock.
 - **Filter out:** the Filter out field on the settings page takes one rule per line. Case does not matter.
   - `@channel show "before you buy"` shows only the videos from that channel with those words in the title.
   - `@channel hide "top 10"` hides the videos from that channel with those words in the title.

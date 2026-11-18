@@ -386,3 +386,23 @@ test("channelNameFromHtml reads og:title", () => {
   assert.equal(Y.channelNameFromHtml('<meta property="og:title" content="Tom &amp; Jerry &#39;Official&#39;">'), "tom & jerry 'official'");
   assert.equal(Y.channelNameFromHtml("<html></html>"), "");
 });
+
+test("channel links and channel IDs in the block list", () => {
+  const tile = video({ channel: "gameranx", handle: "", title: "GTA 6: 25 Things" });
+  const names = { "@gameranxtv": "gameranx" };
+  const block = (blockChannels) => Y.decideTile(tile, { ...S, blockChannels, channelNames: names });
+  assert.equal(Y.channelKey("https://www.youtube.com/@gameranxTV/videos"), "@gameranxtv");
+  assert.equal(Y.channelKey("youtube.com/channel/UCNvzD7Z-g64bPXxGzaQaa4g"), "ucnvzd7z-g64bpxxgzaqaa4g");
+  assert.equal(Y.channelKey("gameranx"), "gameranx");
+  assert.equal(block("https://www.youtube.com/@gameranxTV"), "blocked");
+  assert.equal(block("gameranxTV"), "blocked"); // handle typed without @
+  assert.equal(block("gameranx"), "blocked");
+  assert.deepEqual(Y.ruleHandles({ blockChannels: "https://www.youtube.com/@gameranxTV", blockWords: "" }), ["@gameranxtv"]);
+  // A channel ID only matches what knows the ID (the player), never a tile by name.
+  const id = "https://www.youtube.com/channel/UCNvzD7Z-g64bPXxGzaQaa4g";
+  assert.equal(block(id), null);
+  const base = { played: new Set(), watched: new Set(), settings: { ...S, blockChannels: id } };
+  const player = { title: "GTA 6", channel: "gameranx", handle: "@gameranxTV", channelId: "UCNvzD7Z-g64bPXxGzaQaa4g" };
+  assert.equal(Y.autoplaySkip("x", { ...base, video: player }), "hidden");
+  assert.equal(Y.autoplaySkip("x", { ...base, video: player, picked: true }), "hidden");
+});
