@@ -79,13 +79,16 @@
       const d = p.getVideoData ? p.getVideoData() : null;
       if (!d || d.video_id !== id || !d.title) return;
       let handle = "";
+      let channelId = "";
       try {
-        const url = p.getPlayerResponse().microformat.playerMicroformatRenderer.ownerProfileUrl || "";
+        const r = p.getPlayerResponse();
+        channelId = (r.videoDetails && r.videoDetails.channelId) || "";
+        const url = r.microformat.playerMicroformatRenderer.ownerProfileUrl || "";
         handle = (/\/(@[^/?#]+)/.exec(url) || [])[1] || "";
       } catch {
         // no handle in this player version: name rules still work
       }
-      const json = JSON.stringify({ id, title: d.title, channel: d.author || "", handle });
+      const json = JSON.stringify({ id, title: d.title, channel: d.author || "", handle, channelId });
       if (document.documentElement.dataset.ytfVideo !== json) document.documentElement.dataset.ytfVideo = json;
     } catch {
       // player API changed: smart autoplay falls back to the sidebar tiles
