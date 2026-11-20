@@ -25,6 +25,7 @@ npm run build:chrome   # dist/chrome + Chrome zip (also the Safari source)
 npm run sign           # sign <version>.1 unlisted (.xpi) for the local Zen install
 npm run publish:amo    # send <version> to the AMO listing for review
 npm run publish:chrome # upload to the Chrome Web Store and send for review
+python scripts/read-zen-storage.py  # read the Zen install's settings and smart autoplay log (ytfAutoplayLog)
 ```
 
 ## Release
