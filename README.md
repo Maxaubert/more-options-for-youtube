@@ -5,7 +5,7 @@
 
   A calmer YouTube for Firefox, Zen, Chrome and Safari: hide what you never want to see, and make the player start your way.
 
-  [![Version 0.7.2](https://img.shields.io/badge/version-0.7.2-ff0000?style=flat-square)](manifest.json)
+  [![Version 0.7.5](https://img.shields.io/badge/version-0.7.5-ff0000?style=flat-square)](manifest.json)
   [![Firefox | Zen](https://img.shields.io/badge/Firefox%20%7C%20Zen-142%2B-ff0000?style=flat-square&logo=firefoxbrowser&logoColor=white)](#install)
   [![Chrome | Edge](https://img.shields.io/badge/Chrome%20%7C%20Edge-111%2B-ff0000?style=flat-square&logo=googlechrome&logoColor=white)](#install)
   [![Safari](https://img.shields.io/badge/Safari-on%20a%20Mac-ff0000?style=flat-square&logo=safari&logoColor=white)](docs/safari.md)
@@ -14,6 +14,8 @@
   [![Licence: MIT](https://img.shields.io/badge/licence-MIT-ff0000?style=flat-square)](LICENSE)
   [![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-support-ff0000?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/maxaubert)
 
+  [**Add to Firefox**](https://addons.mozilla.org/addon/more-options-for-youtube/) · [**Add to Chrome**](https://chromewebstore.google.com/detail/igjngbapajhfjnbldgacaajdccpfnfcp)
+
   [Install](#install) · [Features](#features) · [Support](#support) · [Store text](docs/store-listing.md)
 </div>
 
@@ -21,6 +23,10 @@ YouTube decides a lot for you: Shorts everywhere, videos that turn out to be mem
 loops the same five videos, previews that start the moment your mouse rests on a thumbnail. More Options
 for YouTube gives each of those a switch. Everything runs in your browser, with no account and nothing
 sent anywhere.
+
+A free, open-source YouTube blocker and customizer: hide Shorts, block channels, remove members-only
+videos, stop autoplay repeats, set default speed and quality, and use dark themes. Works as a Firefox, Zen,
+Chrome, Edge and Safari extension.
 
 <p align="center">
   <img src="docs/store/screenshot-1.png" alt="The popup" width="640">
