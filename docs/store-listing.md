@@ -13,6 +13,7 @@ so each store has the newest version in review or live. To check:
 
 Neither store had the add-on public on 2026-11-10; both were reviewing 0.5.5.
 Checked 2026-11-15: both public with 0.7.2. AMO approved 0.7.2 on 2026-11-14 (email; AMO API status `public`).
+Checked 2026-11-24: 0.7.5 sent to both. AMO: 0.7.2 public, 0.7.5 unreviewed. Chrome: 0.7.2 published, 0.7.5 pending review.
 Chrome: `publish-chrome.py status` says PUBLISHED, 0.7.2, 100% rollout.
 
 ## Name
@@ -81,5 +82,5 @@ Bug reports and ideas are welcome there.
 
 ## To do on AMO (Max, in the Developer Hub)
 
-- [ ] Upload the new screenshots (Edit Product Page > Media).
-- [ ] Set the Contributions URL.
+- [x] Screenshots: 3 are on the AMO page (checked by API 2026-11-24).
+- [x] Contributions URL is set (https://ko-fi.com/maxaubert).
