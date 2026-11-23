@@ -27,7 +27,7 @@ Hide Shorts, members-only and old videos, block channels, skip repeats in autopl
 
 ## Description
 
-A calmer YouTube, on your terms.
+A calmer YouTube, on your terms. A free YouTube blocker and customizer: hide Shorts, block channels, remove members-only videos, stop autoplay repeats, set default speed and quality, and use dark themes.
 
 **Hide what you never want to see**
 - Shorts, Playables, news and trending rows, live streams, mixes and playlists, each with its own switch
@@ -71,7 +71,7 @@ Bug reports and ideas are welcome there.
 | Field | Value |
 |---|---|
 | Categories | Appearance; Photos, Music & Videos |
-| Tags | youtube, shorts, filter, autoplay, accessibility |
+| Tags | youtube, shorts, block shorts, filter, autoplay, dark theme, channel blocker, accessibility |
 | Licence | MIT |
 | Privacy policy | Not needed. The add-on collects no data (`data_collection_permissions: none`). |
 | Support | The GitHub link in the description |
