@@ -75,7 +75,7 @@
         ? channelEl.textContent.trim()
         : avatar
           ? avatar.getAttribute("aria-label").replace(/^(Go to channel|Gå til kanalen) /, "").trim()
-          : "",
+          : Y.channelFromTexts(texts(tile, '[class*="ContentMetadataViewModelMetadataRow"] [class*="MetadataText"]')),
       handle: handleLink ? handleLink.getAttribute("href").slice(1).split(/[/?]/)[0] : "",
       members: badges.some(Y.isMembersOnly) || meta.some(Y.isMembersOnly),
       live: styles.includes("LIVE") || badges.some(Y.isLiveBadge) || meta.some(Y.isWatching),
@@ -328,29 +328,63 @@
     const id = currentId();
     if (!id) return;
     const autoplayed = navByAutoplay || (endedAt && Date.now() - endedAt < 20000 && userAt < endedAt);
+    const timing = { navByAutoplay, msSinceEnded: endedAt ? Date.now() - endedAt : null, msSinceUser: Date.now() - userAt };
     navByAutoplay = false;
     endedAt = 0;
     const picked = ourPick === id;
     ourPick = "";
-    const known = { played: new Set(played), watched, tile: tileState.get(id), settings };
+    const known = { played: new Set(played), watched, tile: tileState.get(id), settings, picked };
     remember(played, "ytfPlayed", id);
-    if (!settings.enabled || !settings.smartAutoplay || !autoplayed || picked) return;
+    const log = { id, autoplayed: !!autoplayed, picked, tile: known.tile || null, timing };
+    if (!settings.enabled || !settings.smartAutoplay || !(autoplayed || picked)) {
+      logAutoplay({ ...log, why: autoplayed || picked ? "smart autoplay off" : "not autoplay" });
+      return;
+    }
     const why = Y.autoplaySkip(id, known);
-    if (why) return skipRepeat(id, why !== "hidden");
-    // Not known from a tile: wait for the player's title and channel (main.js), then check the filters.
+    if (why) {
+      logAutoplay({ ...log, why });
+      return skipRepeat(id, why !== "hidden");
+    }
+    // Not known from a tile, or our own pick: check the player's title and channel (main.js) against the filters.
+    // Right after a page change the player can still report the old video's title or channel under the new id,
+    // so every change in the first 5 seconds is checked, not only the first one.
     let tries = 0;
+    let seen = "";
     const timer = setInterval(() => {
+      const raw = ROOT.dataset.ytfVideo || "";
+      if (currentId() !== id || ++tries > 20) {
+        clearInterval(timer);
+        if (currentId() === id) logAutoplay({ ...log, why: null, video: seen ? JSON.parse(seen) : null });
+        return;
+      }
+      if (raw === seen) return;
       let video = null;
       try {
-        video = JSON.parse(ROOT.dataset.ytfVideo || "null");
+        video = JSON.parse(raw || "null");
       } catch {
         // ignore
       }
-      const ready = video && video.id === id;
-      if (ready || ++tries > 20 || currentId() !== id) clearInterval(timer);
-      const late = ready && currentId() === id && Y.autoplaySkip(id, { ...known, video });
-      if (late) skipRepeat(id, late !== "hidden");
+      if (!video || video.id !== id) return;
+      seen = raw;
+      const late = Y.autoplaySkip(id, { ...known, video });
+      if (late) {
+        clearInterval(timer);
+        logAutoplay({ ...log, why: late, video });
+        skipRepeat(id, late !== "hidden");
+      }
     }, 250);
+  }
+
+  // The last 30 smart-autoplay decisions, kept in the add-on's own storage (never sent anywhere) to find out
+  // why a video was or was not skipped.
+  async function logAutoplay(entry) {
+    try {
+      const { ytfAutoplayLog } = await browser.storage.local.get({ ytfAutoplayLog: [] });
+      const rules = { blockChannels: settings.blockChannels, blockWords: settings.blockWords };
+      await browser.storage.local.set({ ytfAutoplayLog: [...ytfAutoplayLog, { at: new Date().toISOString(), ...entry, rules }].slice(-30) });
+    } catch {
+      // storage full or gone: the log is only for diagnosis
+    }
   }
 
   // resume: play the video anyway when the sidebar has nothing better (a repeat beats stopping dead,

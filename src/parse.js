@@ -209,17 +209,32 @@
   // Whether a tile's channel is the listed name c (lower case): the exact name or its @handle.
   // Tiles next to a video show only the channel name, not the @handle. names = {"@handle": "channel name"}
   // (lower case, from content.js) lets a handle in a rule match those tiles too.
-  function channelIs(info, c, names) {
+  function channelIs(info, rule, names) {
+    const c = channelKey(rule);
+    if (/^uc[\w-]{22}$/.test(c)) return !!info.channelId && info.channelId.toLowerCase() === c;
     const channel = (info.channel || "").trim().toLowerCase();
     if (channel && (c === channel || c === "@" + channel || c.replace(/^@/, "") === channel)) return true;
     const known = names && names["@" + c.replace(/^@/, "")];
     if (channel && known && known === channel) return true;
-    return !!info.handle && info.handle.toLowerCase() === c;
+    return !!info.handle && info.handle.toLowerCase() === "@" + c.replace(/^@/, "");
+  }
+
+  // A pasted channel link means its @handle or channel ID: "https://www.youtube.com/@gameranxTV/videos" -> "@gameranxtv",
+  // "youtube.com/channel/UC..." -> "uc...". Anything else stays as typed (lower case).
+  function channelKey(c) {
+    const m = /^(?:https?:\/\/)?(?:www\.|m\.)?youtube\.com\/(?:(@[^/?#\s]+)|channel\/(uc[\w-]{22}))/i.exec(c);
+    if (!m) return c;
+    if (m[2]) return m[2].toLowerCase();
+    try {
+      return decodeURIComponent(m[1]).toLowerCase();
+    } catch {
+      return m[1].toLowerCase();
+    }
   }
 
   // Channels in the rules that may be @handles (one word): content.js looks up their channel names.
   function ruleHandles(s) {
-    const listed = [...parseList(s.blockChannels), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
+    const listed = [...parseList(s.blockChannels).map(channelKey), ...parseTitleRules(s.blockWords).map((r) => r.channel).filter(Boolean)];
     return [...new Set(listed.map((c) => "@" + c.replace(/^@/, "")).filter((c) => /^@[\w.-]{3,30}$/.test(c)))];
   }
 
@@ -247,8 +262,15 @@
     const out = [];
     (text || "").split("\n").forEach((raw, i) => {
       const line = raw.trim();
-      if (!line.startsWith("@")) return;
       const n = `Line ${i + 1}: `;
+      if (!line.startsWith("@")) {
+        // 'gameranxTV show "Before you buy"' without the "@" is read as plain title words, not as a channel rule.
+        const head = line.slice(0, line.indexOf('"'));
+        if (line.includes('"') && /(^|\s)(show|only|hide)\s*$/i.test(head)) {
+          out.push(n + 'start the line with @ and the channel, like @channel show "words". Without @ it is read as title words.');
+        }
+        return;
+      }
       const quote = line.indexOf('"');
       if (quote < 0) return out.push(n + 'put the title words in quotes, like @channel show "words".');
       if ((line.match(/"/g) || []).length % 2) return out.push(n + "a quote mark is missing.");
@@ -409,31 +431,6 @@
     return m ? m[1] || m[2] : null;
   }
 
-  // YouTube player quality names, best first. Target is "highest" or a height like "1080".
-  const QUALITY = ["highres", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
-  const QUALITY_HEIGHT = { highres: 4320, hd2160: 2160, hd1440: 1440, hd1080: 1080, hd720: 720, large: 480, medium: 360, small: 240, tiny: 144 };
-
-  function pickQuality(available, target) {
-    const levels = QUALITY.filter((q) => available.includes(q));
-    if (!levels.length) return null;
-    if (target === "highest") return levels[0];
-    const max = Number(target);
-    return levels.find((q) => QUALITY_HEIGHT[q] <= max) || levels[levels.length - 1];
-  }
-
-  // Caption track to switch to. tracks: [{languageCode, kind}] from the player. Returns
-  // {track} to pick one, {translate: track} to auto-translate it, "off", or null to leave YouTube alone.
-  function pickSubtitles(tracks, want) {
-    if (want === "off") return "off";
-    if (want !== "no" && want !== "en") return null;
-    const codes = want === "no" ? ["nb", "no", "nn"] : ["en"];
-    const matches = (t) => codes.some((c) => (t.languageCode || "").toLowerCase().split("-")[0] === c);
-    const exact = tracks.filter(matches);
-    if (exact.length) return { track: exact.find((t) => t.kind !== "asr") || exact[0] };
-    if (!tracks.length) return null;
-    return { translate: tracks.find((t) => t.kind !== "asr") || tracks[0], to: want === "no" ? "no" : "en" };
-  }
-
   // Next video for smart autoplay: first candidate not played, not watched and not the current one.
   function pickNext(candidates, current, played, watched) {
     return candidates.find((c) => c.id && c.id !== current && !played.has(c.id) && !watched.has(c.id)) || null;
@@ -449,24 +446,37 @@
   }
 
   // Why smart autoplay should skip a video it just landed on, or null to keep it.
-  // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel} from the player.
-  function autoplaySkip(id, { played, watched, tile, video, settings }) {
+  // tile: what the add-on last saw of it as a tile {reason, watchedPct}; video: {title, channel, handle} from the player.
+  // picked: smart autoplay chose this video itself from the sidebar. It was not played or watched then, but its tile
+  // may have been read wrong (no channel name on it, or the @handle's name not known yet), so the player's title and
+  // channel are still checked against the filters.
+  function autoplaySkip(id, { played, watched, tile, video, settings, picked = false }) {
+    if (picked) return video && video.title && filteredVideo(video, settings) ? "hidden" : null;
     if (played.has(id)) return "played";
     if (watched.has(id)) return "watched";
     if (tile && tile.watchedPct != null) return "watched";
     if (tile && tile.reason) return "hidden";
-    if (video && video.title) {
-      const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "" }, settings);
-      if (reason === "blocked" || reason === "keepOnly") return "hidden";
-    }
+    if (video && video.title && filteredVideo(video, settings)) return "hidden";
     return null;
+  }
+
+  // Whether the filters hide the video the player plays ({title, channel, handle}).
+  function filteredVideo(video, settings) {
+    const reason = decideTile({ kind: "video", title: video.title, channel: video.channel || "", handle: video.handle || "", channelId: video.channelId || "" }, settings);
+    return reason === "blocked" || reason === "keepOnly";
+  }
+
+  // The channel name among the texts under a tile (["gameranx", "822K", "11d ago"]): the first one that is not
+  // views, a date or live info. For tiles with no channel link or avatar to read the name from.
+  function channelFromTexts(list) {
+    return (list || []).find((t) => t && !isMetaText(t)) || "";
   }
 
   const YTF = {
     DEFAULTS, REASONS, UNIT_DAYS, PAGE_PARTS, THEMES, lookFor, themeVarOverrides,
     parseAgeDays, parseViews, isMembersOnly, isLiveBadge, isWatching, isUpcoming, isNewsTitle,
     isPlayablesTitle, kindFromHref, decideTile, decideShelf, parseList, isBlocked, parseTitleRules, checkTitleRules, failsKeepOnly, ruleHandles, channelNameFromHtml, migrateKeepOnly, hideMembers, inChannelList, parseChannelList,
-    isMetaText, videoIdFromHref, pickQuality, pickSubtitles, pickNext, wasAutoplay, autoplaySkip,
+    isMetaText, channelFromTexts, videoIdFromHref, pickNext, wasAutoplay, autoplaySkip, channelKey,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = YTF;
   root.YTF = YTF;
